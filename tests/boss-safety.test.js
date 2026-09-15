@@ -31,11 +31,26 @@ test('Boss 抛出异常时仍尝试安全退场且保留原始异常', async () 
 
 test('安全退场失败时不覆盖已完成的 Boss 结果', async () => {
   let warningCount = 0;
+  let cleanupError = null;
   const result = await runBossTaskWithSafeExit({
     runTask: async () => ({ 承光的鳞羽: 3 }),
     teleportToStatue: async () => { throw new Error('传送失败'); },
     logger: { info() {}, warn() { warningCount += 1; } },
+    onCleanupFailure: (error) => { cleanupError = error; },
   });
   assert.deepEqual(result, { 承光的鳞羽: 3 });
   assert.equal(warningCount, 1);
+  assert.equal(cleanupError.message, '传送失败');
+});
+
+test('记录安全退场证据的回调失败也不会覆盖 Boss 结果', async () => {
+  let warningCount = 0;
+  const result = await runBossTaskWithSafeExit({
+    runTask: async () => ({ 极寒之核: 3 }),
+    teleportToStatue: async () => { throw new Error('传送失败'); },
+    logger: { info() {}, warn() { warningCount += 1; } },
+    onCleanupFailure: () => { throw new Error('记录失败'); },
+  });
+  assert.deepEqual(result, { 极寒之核: 3 });
+  assert.equal(warningCount, 2);
 });

@@ -7,6 +7,7 @@ const materials = {
   mid: { name: '「浪迹」的指引' },
   high: { name: '「浪迹」的哲学' },
   boss: { name: '堕天的落羽' },
+  knife: { name: '猎兵祭刀' },
 };
 
 test('奖励字典兼容普通对象、ClearScript 索引器和枚举器', () => {
@@ -77,6 +78,51 @@ test('背包漏识别时使用任务奖励兜底并更新库存', () => {
   assert.deepEqual(result.gainSources, { 堕天的落羽: 'task-recognition' });
   assert.deepEqual(result.taskTrackedRewards, { 堕天的落羽: 12 });
   assert.equal(20 - result.trackedRewards.堕天的落羽, 8);
+});
+
+test('执行前漏识别、执行后重新找到时不把既有库存误报为收益', () => {
+  const result = reconcileRewardEvidence({
+    inventoryBefore: { knife: 0 },
+    inventoryAfter: { knife: 2951 },
+    trackedMaterialIds: ['knife'],
+    materials,
+    inventoryBeforeIssueNames: ['猎兵祭刀'],
+    taskRecognizedRewards: {},
+    taskExecutionType: 'domain',
+  });
+  assert.deepEqual(result.inventoryTrackedRewards, {});
+  assert.deepEqual(result.trackedRewards, {});
+  assert.equal(result.inventory.knife, 2951);
+});
+
+test('执行前漏识别但结束背包可靠时使用任务奖励确认收益并保留真实库存', () => {
+  const result = reconcileRewardEvidence({
+    inventoryBefore: { mid: 0 },
+    inventoryAfter: { mid: 27 },
+    trackedMaterialIds: ['mid'],
+    materials,
+    inventoryBeforeIssueNames: ['「浪迹」的指引'],
+    taskRecognizedRewards: { '「浪迹」的指引': 27 },
+    taskExecutionType: 'domain',
+  });
+  assert.deepEqual(result.trackedRewards, { '「浪迹」的指引': 27 });
+  assert.deepEqual(result.gainSources, { '「浪迹」的指引': 'task-recognition' });
+  assert.equal(result.inventory.mid, 27);
+});
+
+test('执行前后均漏识别时以任务奖励作为可证明的库存增长', () => {
+  const result = reconcileRewardEvidence({
+    inventoryBefore: { mid: 0 },
+    inventoryAfter: { mid: 0 },
+    trackedMaterialIds: ['mid'],
+    materials,
+    inventoryBeforeIssueNames: ['「浪迹」的指引'],
+    inventoryAfterIssueNames: ['「浪迹」的指引'],
+    taskRecognizedRewards: { '「浪迹」的指引': 25 },
+    taskExecutionType: 'domain',
+  });
+  assert.deepEqual(result.trackedRewards, { '「浪迹」的指引': 25 });
+  assert.equal(result.inventory.mid, 25);
 });
 
 test('背包与任务奖励冲突时保留背包结果并记录差异', () => {
