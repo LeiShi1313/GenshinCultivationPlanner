@@ -1480,39 +1480,93 @@
   },
   "104365": {
     "name": "「慈爱」的教导",
-    "status": "manual",
-    "executionType": "none",
-    "reason": "尚未配置已验证的执行适配"
+    "status": "supported",
+    "executionType": "domain",
+    "domainName": "荒坠的圣迹",
+    "sundaySelectedValue": "1",
+    "openDays": [
+      1,
+      4,
+      0
+    ],
+    "limited": true,
+    "priority": 100,
+    "reason": "BetterGI 0.64.0 f0cd4fe 源码支持；未实机回归"
   },
   "104366": {
     "name": "「慈爱」的指引",
-    "status": "manual",
-    "executionType": "none",
-    "reason": "尚未配置已验证的执行适配"
+    "status": "supported",
+    "executionType": "domain",
+    "domainName": "荒坠的圣迹",
+    "sundaySelectedValue": "1",
+    "openDays": [
+      1,
+      4,
+      0
+    ],
+    "limited": true,
+    "priority": 100,
+    "reason": "BetterGI 0.64.0 f0cd4fe 源码支持；未实机回归"
   },
   "104367": {
     "name": "「慈爱」的哲学",
-    "status": "manual",
-    "executionType": "none",
-    "reason": "尚未配置已验证的执行适配"
+    "status": "supported",
+    "executionType": "domain",
+    "domainName": "荒坠的圣迹",
+    "sundaySelectedValue": "1",
+    "openDays": [
+      1,
+      4,
+      0
+    ],
+    "limited": true,
+    "priority": 100,
+    "reason": "BetterGI 0.64.0 f0cd4fe 源码支持；未实机回归"
   },
   "104368": {
     "name": "「坚忍」的教导",
-    "status": "manual",
-    "executionType": "none",
-    "reason": "尚未配置已验证的执行适配"
+    "status": "supported",
+    "executionType": "domain",
+    "domainName": "荒坠的圣迹",
+    "sundaySelectedValue": "2",
+    "openDays": [
+      2,
+      5,
+      0
+    ],
+    "limited": true,
+    "priority": 100,
+    "reason": "BetterGI 0.64.0 f0cd4fe 源码支持；未实机回归"
   },
   "104369": {
     "name": "「坚忍」的指引",
-    "status": "manual",
-    "executionType": "none",
-    "reason": "尚未配置已验证的执行适配"
+    "status": "supported",
+    "executionType": "domain",
+    "domainName": "荒坠的圣迹",
+    "sundaySelectedValue": "2",
+    "openDays": [
+      2,
+      5,
+      0
+    ],
+    "limited": true,
+    "priority": 100,
+    "reason": "BetterGI 0.64.0 f0cd4fe 源码支持；未实机回归"
   },
   "104370": {
     "name": "「坚忍」的哲学",
-    "status": "manual",
-    "executionType": "none",
-    "reason": "尚未配置已验证的执行适配"
+    "status": "supported",
+    "executionType": "domain",
+    "domainName": "荒坠的圣迹",
+    "sundaySelectedValue": "2",
+    "openDays": [
+      2,
+      5,
+      0
+    ],
+    "limited": true,
+    "priority": 100,
+    "reason": "BetterGI 0.64.0 f0cd4fe 源码支持；未实机回归"
   },
   "112002": {
     "name": "史莱姆凝液",
