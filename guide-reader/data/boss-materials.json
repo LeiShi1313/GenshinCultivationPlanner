@@ -1,0 +1,1117 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "genshinDb": {
+      "repository": "https://github.com/theBowja/genshin-db",
+      "commit": "8b15995fa220c88a4d0d7ffe1e21b041d0b32588",
+      "packageVersion": "5.2.13",
+      "gameDataVersion": "7.0",
+      "locale": "ChineseSimplified",
+      "license": "MIT",
+      "licenseFile": "LICENSE.genshin-db",
+      "recordBaseUrl": "https://github.com/theBowja/genshin-db/blob/8b15995fa220c88a4d0d7ffe1e21b041d0b32588/src/data/ChineseSimplified/"
+    },
+    "betterGi": {
+      "repository": "https://github.com/babalae/better-genshin-impact",
+      "tag": "0.64.0",
+      "commit": "f0cd4fe90d22e9b1fcb3f6b4b61fe6131773410e",
+      "license": "GPL-3.0",
+      "licenseFile": "LICENSE.bettergi",
+      "sourceFile": "BetterGenshinImpact/GameTask/AutoBoss/AutoBossData.cs",
+      "sourceUrl": "https://github.com/babalae/better-genshin-impact/blob/f0cd4fe90d22e9b1fcb3f6b4b61fe6131773410e/BetterGenshinImpact/GameTask/AutoBoss/AutoBossData.cs"
+    },
+    "derivation": {
+      "characterScope": "All 122 distinct ChineseSimplified character records at the pinned genshin-db commit, including separate 空/荧 and 奇偶·男性/奇偶·女性 identities.",
+      "bossMaterialRule": "mapped requires exactly one rarity-4 AVATAR_MATERIAL whose exact numeric ID occurs once in each of ascend2 through ascend6; the emitted name is read from that same material record.",
+      "noneRule": "none means every ascend2-through-ascend6 cost list contains no cataloged normal-boss material ID. A null bossMaterial must be interpreted with bossRequirement and never as unread data or zero demand.",
+      "unknownRule": "unknown is reserved for missing, conflicting, or ambiguous stage evidence; its bossMaterial remains null. This pinned source produced no unknown character mappings.",
+      "normalBossMaterialRule": "Materials are limited to rarity-4 AVATAR_MATERIAL records with an exact sourceTexts entry in the game source form 30级以上…掉落; gems, weekly-boss materials, and common enemy drops are excluded.",
+      "supportRule": "supported is true only when one complete sourceTexts entry exactly wraps one BetterGI AutoBossData supported name as 30级以上<name>掉落. Shared aliases and names absent from BetterGI remain boss:null and supported:false.",
+      "sourceTextRule": "sourceTexts preserves the exact normalized Chinese strings from each pinned MIT material record; no alias is synthesized from a material name or substring."
+    }
+  },
+  "characters": {
+    "七七": {
+      "id": 10000035,
+      "bossRequirement": "mapped",
+      "bossMaterial": "极寒之核"
+    },
+    "丝柯克": {
+      "id": 10000114,
+      "bossRequirement": "mapped",
+      "bossMaterial": "深邃纠缠的凝视"
+    },
+    "丽莎": {
+      "id": 10000006,
+      "bossRequirement": "mapped",
+      "bossMaterial": "雷光棱镜"
+    },
+    "久岐忍": {
+      "id": 10000065,
+      "bossRequirement": "mapped",
+      "bossMaterial": "符纹之齿"
+    },
+    "九条裟罗": {
+      "id": 10000056,
+      "bossRequirement": "mapped",
+      "bossMaterial": "雷霆数珠"
+    },
+    "云堇": {
+      "id": 10000064,
+      "bossRequirement": "mapped",
+      "bossMaterial": "兽境王器"
+    },
+    "五郎": {
+      "id": 10000055,
+      "bossRequirement": "mapped",
+      "bossMaterial": "恒常机关之心"
+    },
+    "伊安珊": {
+      "id": 10000110,
+      "bossRequirement": "mapped",
+      "bossMaterial": "深邃纠缠的凝视"
+    },
+    "伊法": {
+      "id": 10000113,
+      "bossRequirement": "mapped",
+      "bossMaterial": "龙像的无智核"
+    },
+    "伊涅芙": {
+      "id": 10000116,
+      "bossRequirement": "mapped",
+      "bossMaterial": "秘源积气喉"
+    },
+    "优菈": {
+      "id": 10000051,
+      "bossRequirement": "mapped",
+      "bossMaterial": "晶凝之华"
+    },
+    "克洛琳德": {
+      "id": 10000098,
+      "bossRequirement": "mapped",
+      "bossMaterial": "原海麟角"
+    },
+    "八重神子": {
+      "id": 10000058,
+      "bossRequirement": "mapped",
+      "bossMaterial": "龙嗣伪鳍"
+    },
+    "兹白": {
+      "id": 10000126,
+      "bossRequirement": "mapped",
+      "bossMaterial": "魇翼枯骸"
+    },
+    "凝光": {
+      "id": 10000027,
+      "bossRequirement": "mapped",
+      "bossMaterial": "玄岩之塔"
+    },
+    "凯亚": {
+      "id": 10000015,
+      "bossRequirement": "mapped",
+      "bossMaterial": "极寒之核"
+    },
+    "刻晴": {
+      "id": 10000042,
+      "bossRequirement": "mapped",
+      "bossMaterial": "雷光棱镜"
+    },
+    "北斗": {
+      "id": 10000024,
+      "bossRequirement": "mapped",
+      "bossMaterial": "雷光棱镜"
+    },
+    "千织": {
+      "id": 10000094,
+      "bossRequirement": "mapped",
+      "bossMaterial": "奇械发条备件·歌裴莉娅"
+    },
+    "卡维": {
+      "id": 10000081,
+      "bossRequirement": "mapped",
+      "bossMaterial": "灭诤草蔓"
+    },
+    "卡齐娜": {
+      "id": 10000100,
+      "bossRequirement": "mapped",
+      "bossMaterial": "过熟的火榴果"
+    },
+    "可莉": {
+      "id": 10000029,
+      "bossRequirement": "mapped",
+      "bossMaterial": "常燃火种"
+    },
+    "叶洛亚": {
+      "id": 10000127,
+      "bossRequirement": "mapped",
+      "bossMaterial": "循环式军用月矩核心"
+    },
+    "哥伦比娅": {
+      "id": 10000125,
+      "bossRequirement": "mapped",
+      "bossMaterial": "漫光的辉角"
+    },
+    "嘉明": {
+      "id": 10000092,
+      "bossRequirement": "mapped",
+      "bossMaterial": "帝皇的决断"
+    },
+    "坎蒂丝": {
+      "id": 10000072,
+      "bossRequirement": "mapped",
+      "bossMaterial": "导光四面体"
+    },
+    "埃洛伊": {
+      "id": 10000062,
+      "bossRequirement": "mapped",
+      "bossMaterial": "晶凝之华"
+    },
+    "基尼奇": {
+      "id": 10000101,
+      "bossRequirement": "mapped",
+      "bossMaterial": "过熟的火榴果"
+    },
+    "塔利雅": {
+      "id": 10000115,
+      "bossRequirement": "mapped",
+      "bossMaterial": "秘源积气喉"
+    },
+    "夏沃蕾": {
+      "id": 10000090,
+      "bossRequirement": "mapped",
+      "bossMaterial": "原海麟角"
+    },
+    "夏洛蒂": {
+      "id": 10000088,
+      "bossRequirement": "mapped",
+      "bossMaterial": "「图比昂装置」"
+    },
+    "多莉": {
+      "id": 10000068,
+      "bossRequirement": "mapped",
+      "bossMaterial": "藏雷野实"
+    },
+    "夜兰": {
+      "id": 10000060,
+      "bossRequirement": "mapped",
+      "bossMaterial": "符纹之齿"
+    },
+    "奇偶·女性": {
+      "id": 10000118,
+      "bossRequirement": "none",
+      "bossMaterial": null
+    },
+    "奇偶·男性": {
+      "id": 10000117,
+      "bossRequirement": "none",
+      "bossMaterial": null
+    },
+    "奈芙尔": {
+      "id": 10000122,
+      "bossRequirement": "mapped",
+      "bossMaterial": "漫光的辉角"
+    },
+    "奥黛塔": {
+      "id": 10000150,
+      "bossRequirement": "mapped",
+      "bossMaterial": "焰中不灭花枝"
+    },
+    "妮露": {
+      "id": 10000070,
+      "bossRequirement": "mapped",
+      "bossMaterial": "永续机芯"
+    },
+    "娜维娅": {
+      "id": 10000091,
+      "bossRequirement": "mapped",
+      "bossMaterial": "奇械发条备件·科培琉司"
+    },
+    "安柏": {
+      "id": 10000021,
+      "bossRequirement": "mapped",
+      "bossMaterial": "常燃火种"
+    },
+    "宵宫": {
+      "id": 10000049,
+      "bossRequirement": "mapped",
+      "bossMaterial": "阴燃之珠"
+    },
+    "尼可": {
+      "id": 10000131,
+      "bossRequirement": "mapped",
+      "bossMaterial": "魇翼枯骸"
+    },
+    "布伦妮": {
+      "id": 10000132,
+      "bossRequirement": "mapped",
+      "bossMaterial": "漫光的辉角"
+    },
+    "希格雯": {
+      "id": 10000095,
+      "bossRequirement": "mapped",
+      "bossMaterial": "未能达成超越之水"
+    },
+    "希诺宁": {
+      "id": 10000103,
+      "bossRequirement": "mapped",
+      "bossMaterial": "秘刻金纹的源核"
+    },
+    "恰斯卡": {
+      "id": 10000104,
+      "bossRequirement": "mapped",
+      "bossMaterial": "深邃纠缠的凝视"
+    },
+    "托马": {
+      "id": 10000050,
+      "bossRequirement": "mapped",
+      "bossMaterial": "阴燃之珠"
+    },
+    "提纳里": {
+      "id": 10000069,
+      "bossRequirement": "mapped",
+      "bossMaterial": "蕈王钩喙"
+    },
+    "早柚": {
+      "id": 10000053,
+      "bossRequirement": "mapped",
+      "bossMaterial": "魔偶机心"
+    },
+    "杜林": {
+      "id": 10000123,
+      "bossRequirement": "mapped",
+      "bossMaterial": "循环式军用月矩核心"
+    },
+    "林尼": {
+      "id": 10000084,
+      "bossRequirement": "mapped",
+      "bossMaterial": "帝皇的决断"
+    },
+    "枫原万叶": {
+      "id": 10000047,
+      "bossRequirement": "mapped",
+      "bossMaterial": "魔偶机心"
+    },
+    "柯莱": {
+      "id": 10000067,
+      "bossRequirement": "mapped",
+      "bossMaterial": "蕈王钩喙"
+    },
+    "桑多涅": {
+      "id": 10000133,
+      "bossRequirement": "mapped",
+      "bossMaterial": "堕天的落羽"
+    },
+    "梦见月瑞希": {
+      "id": 10000109,
+      "bossRequirement": "mapped",
+      "bossMaterial": "谜土的护符"
+    },
+    "欧洛伦": {
+      "id": 10000105,
+      "bossRequirement": "mapped",
+      "bossMaterial": "受祝所缚之印"
+    },
+    "法尔伽": {
+      "id": 10000128,
+      "bossRequirement": "mapped",
+      "bossMaterial": "棱光的断尾"
+    },
+    "洛恩": {
+      "id": 10000129,
+      "bossRequirement": "mapped",
+      "bossMaterial": "棱光的断尾"
+    },
+    "流浪者": {
+      "id": 10000075,
+      "bossRequirement": "mapped",
+      "bossMaterial": "永续机芯"
+    },
+    "温迪": {
+      "id": 10000022,
+      "bossRequirement": "mapped",
+      "bossMaterial": "飓风之种"
+    },
+    "烟绯": {
+      "id": 10000048,
+      "bossRequirement": "mapped",
+      "bossMaterial": "未熟之玉"
+    },
+    "爱可菲": {
+      "id": 10000112,
+      "bossRequirement": "mapped",
+      "bossMaterial": "秘源积气喉"
+    },
+    "爱诺": {
+      "id": 10000121,
+      "bossRequirement": "mapped",
+      "bossMaterial": "精密型月矩力冲鸭模具"
+    },
+    "玛拉妮": {
+      "id": 10000102,
+      "bossRequirement": "mapped",
+      "bossMaterial": "受祝所缚之印"
+    },
+    "玛薇卡": {
+      "id": 10000106,
+      "bossRequirement": "mapped",
+      "bossMaterial": "秘刻金纹的源核"
+    },
+    "珊瑚宫心海": {
+      "id": 10000054,
+      "bossRequirement": "mapped",
+      "bossMaterial": "排异之露"
+    },
+    "珐露珊": {
+      "id": 10000076,
+      "bossRequirement": "mapped",
+      "bossMaterial": "导光四面体"
+    },
+    "班尼特": {
+      "id": 10000032,
+      "bossRequirement": "mapped",
+      "bossMaterial": "常燃火种"
+    },
+    "琳妮特": {
+      "id": 10000083,
+      "bossRequirement": "mapped",
+      "bossMaterial": "奇械发条备件·歌裴莉娅"
+    },
+    "琴": {
+      "id": 10000003,
+      "bossRequirement": "mapped",
+      "bossMaterial": "飓风之种"
+    },
+    "瑶瑶": {
+      "id": 10000077,
+      "bossRequirement": "mapped",
+      "bossMaterial": "灭诤草蔓"
+    },
+    "瓦雷莎": {
+      "id": 10000111,
+      "bossRequirement": "mapped",
+      "bossMaterial": "龙像的无智核"
+    },
+    "甘雨": {
+      "id": 10000037,
+      "bossRequirement": "mapped",
+      "bossMaterial": "极寒之核"
+    },
+    "申鹤": {
+      "id": 10000063,
+      "bossRequirement": "mapped",
+      "bossMaterial": "龙嗣伪鳍"
+    },
+    "白术": {
+      "id": 10000082,
+      "bossRequirement": "mapped",
+      "bossMaterial": "常暗圆环"
+    },
+    "砂糖": {
+      "id": 10000043,
+      "bossRequirement": "mapped",
+      "bossMaterial": "飓风之种"
+    },
+    "神里绫人": {
+      "id": 10000066,
+      "bossRequirement": "mapped",
+      "bossMaterial": "排异之露"
+    },
+    "神里绫华": {
+      "id": 10000002,
+      "bossRequirement": "mapped",
+      "bossMaterial": "恒常机关之心"
+    },
+    "空": {
+      "id": 10000005,
+      "bossRequirement": "none",
+      "bossMaterial": null
+    },
+    "米卡": {
+      "id": 10000080,
+      "bossRequirement": "mapped",
+      "bossMaterial": "苍砾蕊羽"
+    },
+    "纳西妲": {
+      "id": 10000073,
+      "bossRequirement": "mapped",
+      "bossMaterial": "灭诤草蔓"
+    },
+    "绮良良": {
+      "id": 10000061,
+      "bossRequirement": "mapped",
+      "bossMaterial": "常暗圆环"
+    },
+    "罗莎莉亚": {
+      "id": 10000045,
+      "bossRequirement": "mapped",
+      "bossMaterial": "极寒之核"
+    },
+    "胡桃": {
+      "id": 10000046,
+      "bossRequirement": "mapped",
+      "bossMaterial": "未熟之玉"
+    },
+    "艾尔海森": {
+      "id": 10000078,
+      "bossRequirement": "mapped",
+      "bossMaterial": "苍砾蕊羽"
+    },
+    "艾梅莉埃": {
+      "id": 10000099,
+      "bossRequirement": "mapped",
+      "bossMaterial": "金色旋律的断章"
+    },
+    "芙宁娜": {
+      "id": 10000089,
+      "bossRequirement": "mapped",
+      "bossMaterial": "未能达成超越之水"
+    },
+    "芭芭拉": {
+      "id": 10000014,
+      "bossRequirement": "mapped",
+      "bossMaterial": "净水之心"
+    },
+    "茜特菈莉": {
+      "id": 10000107,
+      "bossRequirement": "mapped",
+      "bossMaterial": "谜土的护符"
+    },
+    "荒泷一斗": {
+      "id": 10000057,
+      "bossRequirement": "mapped",
+      "bossMaterial": "兽境王器"
+    },
+    "荧": {
+      "id": 10000007,
+      "bossRequirement": "none",
+      "bossMaterial": null
+    },
+    "莉奈娅": {
+      "id": 10000130,
+      "bossRequirement": "mapped",
+      "bossMaterial": "堕天的落羽"
+    },
+    "莫娜": {
+      "id": 10000041,
+      "bossRequirement": "mapped",
+      "bossMaterial": "净水之心"
+    },
+    "莱依拉": {
+      "id": 10000074,
+      "bossRequirement": "mapped",
+      "bossMaterial": "永续机芯"
+    },
+    "莱欧斯利": {
+      "id": 10000086,
+      "bossRequirement": "mapped",
+      "bossMaterial": "「图比昂装置」"
+    },
+    "菈乌玛": {
+      "id": 10000119,
+      "bossRequirement": "mapped",
+      "bossMaterial": "承光的鳞羽"
+    },
+    "菲林斯": {
+      "id": 10000120,
+      "bossRequirement": "mapped",
+      "bossMaterial": "精密型月矩力冲鸭模具"
+    },
+    "菲米尼": {
+      "id": 10000085,
+      "bossRequirement": "mapped",
+      "bossMaterial": "奇械发条备件·科培琉司"
+    },
+    "菲谢尔": {
+      "id": 10000031,
+      "bossRequirement": "mapped",
+      "bossMaterial": "雷光棱镜"
+    },
+    "蓝砚": {
+      "id": 10000108,
+      "bossRequirement": "mapped",
+      "bossMaterial": "秘刻金纹的源核"
+    },
+    "行秋": {
+      "id": 10000025,
+      "bossRequirement": "mapped",
+      "bossMaterial": "净水之心"
+    },
+    "诺艾尔": {
+      "id": 10000034,
+      "bossRequirement": "mapped",
+      "bossMaterial": "玄岩之塔"
+    },
+    "赛索斯": {
+      "id": 10000097,
+      "bossRequirement": "mapped",
+      "bossMaterial": "凝云鳞甲"
+    },
+    "赛诺": {
+      "id": 10000071,
+      "bossRequirement": "mapped",
+      "bossMaterial": "藏雷野实"
+    },
+    "辛焱": {
+      "id": 10000044,
+      "bossRequirement": "mapped",
+      "bossMaterial": "常燃火种"
+    },
+    "达达利亚": {
+      "id": 10000033,
+      "bossRequirement": "mapped",
+      "bossMaterial": "净水之心"
+    },
+    "迪卢克": {
+      "id": 10000016,
+      "bossRequirement": "mapped",
+      "bossMaterial": "常燃火种"
+    },
+    "迪奥娜": {
+      "id": 10000039,
+      "bossRequirement": "mapped",
+      "bossMaterial": "极寒之核"
+    },
+    "迪希雅": {
+      "id": 10000079,
+      "bossRequirement": "mapped",
+      "bossMaterial": "导光四面体"
+    },
+    "那维莱特": {
+      "id": 10000087,
+      "bossRequirement": "mapped",
+      "bossMaterial": "原海麟角"
+    },
+    "重云": {
+      "id": 10000036,
+      "bossRequirement": "mapped",
+      "bossMaterial": "极寒之核"
+    },
+    "钟离": {
+      "id": 10000030,
+      "bossRequirement": "mapped",
+      "bossMaterial": "玄岩之塔"
+    },
+    "闲云": {
+      "id": 10000093,
+      "bossRequirement": "mapped",
+      "bossMaterial": "凝云鳞甲"
+    },
+    "阿罗夏": {
+      "id": 10000148,
+      "bossRequirement": "mapped",
+      "bossMaterial": "游空之物的断尾"
+    },
+    "阿蕾奇诺": {
+      "id": 10000096,
+      "bossRequirement": "mapped",
+      "bossMaterial": "金色旋律的断章"
+    },
+    "阿贝多": {
+      "id": 10000038,
+      "bossRequirement": "mapped",
+      "bossMaterial": "玄岩之塔"
+    },
+    "雅珂达": {
+      "id": 10000124,
+      "bossRequirement": "mapped",
+      "bossMaterial": "承光的鳞羽"
+    },
+    "雷泽": {
+      "id": 10000020,
+      "bossRequirement": "mapped",
+      "bossMaterial": "雷光棱镜"
+    },
+    "雷电将军": {
+      "id": 10000052,
+      "bossRequirement": "mapped",
+      "bossMaterial": "雷霆数珠"
+    },
+    "香菱": {
+      "id": 10000023,
+      "bossRequirement": "mapped",
+      "bossMaterial": "常燃火种"
+    },
+    "魈": {
+      "id": 10000026,
+      "bossRequirement": "mapped",
+      "bossMaterial": "未熟之玉"
+    },
+    "鹿野院平藏": {
+      "id": 10000059,
+      "bossRequirement": "mapped",
+      "bossMaterial": "符纹之齿"
+    }
+  },
+  "materials": {
+    "飓风之种": {
+      "id": 113001,
+      "name": "飓风之种",
+      "rarity": 4,
+      "boss": null,
+      "supported": false,
+      "sourceTexts": [
+        "30级以上无相之风掉落"
+      ]
+    },
+    "雷光棱镜": {
+      "id": 113002,
+      "name": "雷光棱镜",
+      "rarity": 4,
+      "boss": "无相之雷",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上无相之雷掉落"
+      ]
+    },
+    "玄岩之塔": {
+      "id": 113009,
+      "name": "玄岩之塔",
+      "rarity": 4,
+      "boss": "无相之岩",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上无相之岩掉落"
+      ]
+    },
+    "极寒之核": {
+      "id": 113010,
+      "name": "极寒之核",
+      "rarity": 4,
+      "boss": "急冻树",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上急冻树掉落"
+      ]
+    },
+    "常燃火种": {
+      "id": 113011,
+      "name": "常燃火种",
+      "rarity": 4,
+      "boss": "爆炎树",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上爆炎树掉落"
+      ]
+    },
+    "净水之心": {
+      "id": 113012,
+      "name": "净水之心",
+      "rarity": 4,
+      "boss": "纯水精灵",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上纯水精灵掉落"
+      ]
+    },
+    "未熟之玉": {
+      "id": 113016,
+      "name": "未熟之玉",
+      "rarity": 4,
+      "boss": "古岩龙蜥",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上古岩龙蜥掉落"
+      ]
+    },
+    "晶凝之华": {
+      "id": 113020,
+      "name": "晶凝之华",
+      "rarity": 4,
+      "boss": null,
+      "supported": false,
+      "sourceTexts": [
+        "30级以上无相之冰掉落"
+      ]
+    },
+    "魔偶机心": {
+      "id": 113022,
+      "name": "魔偶机心",
+      "rarity": 4,
+      "boss": "魔偶剑鬼",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上魔偶剑鬼掉落"
+      ]
+    },
+    "恒常机关之心": {
+      "id": 113023,
+      "name": "恒常机关之心",
+      "rarity": 4,
+      "boss": "恒常机关阵列",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上恒常机关阵列掉落"
+      ]
+    },
+    "阴燃之珠": {
+      "id": 113024,
+      "name": "阴燃之珠",
+      "rarity": 4,
+      "boss": "无相之火",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上无相之火掉落"
+      ]
+    },
+    "排异之露": {
+      "id": 113028,
+      "name": "排异之露",
+      "rarity": 4,
+      "boss": "无相之水",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上无相之水掉落"
+      ]
+    },
+    "雷霆数珠": {
+      "id": 113029,
+      "name": "雷霆数珠",
+      "rarity": 4,
+      "boss": "雷音权现",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上雷音权现掉落"
+      ]
+    },
+    "兽境王器": {
+      "id": 113030,
+      "name": "兽境王器",
+      "rarity": 4,
+      "boss": null,
+      "supported": false,
+      "sourceTexts": [
+        "30级以上黄金王兽掉落"
+      ]
+    },
+    "龙嗣伪鳍": {
+      "id": 113031,
+      "name": "龙嗣伪鳍",
+      "rarity": 4,
+      "boss": null,
+      "supported": false,
+      "sourceTexts": [
+        "30级以上深海龙蜥之群掉落"
+      ]
+    },
+    "符纹之齿": {
+      "id": 113035,
+      "name": "符纹之齿",
+      "rarity": 4,
+      "boss": "遗迹巨蛇",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上遗迹巨蛇掉落"
+      ]
+    },
+    "蕈王钩喙": {
+      "id": 113036,
+      "name": "蕈王钩喙",
+      "rarity": 4,
+      "boss": "翠翎恐蕈",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上翠翎恐蕈掉落"
+      ]
+    },
+    "藏雷野实": {
+      "id": 113037,
+      "name": "藏雷野实",
+      "rarity": 4,
+      "boss": "掣电树",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上掣电树掉落"
+      ]
+    },
+    "永续机芯": {
+      "id": 113038,
+      "name": "永续机芯",
+      "rarity": 4,
+      "boss": "兆载永劫龙兽",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上兆载永劫龙兽掉落"
+      ]
+    },
+    "导光四面体": {
+      "id": 113039,
+      "name": "导光四面体",
+      "rarity": 4,
+      "boss": "半永恒统辖矩阵",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上半永恒统辖矩阵掉落"
+      ]
+    },
+    "灭诤草蔓": {
+      "id": 113040,
+      "name": "灭诤草蔓",
+      "rarity": 4,
+      "boss": "无相之草",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上无相之草掉落"
+      ]
+    },
+    "苍砾蕊羽": {
+      "id": 113044,
+      "name": "苍砾蕊羽",
+      "rarity": 4,
+      "boss": "风蚀沙虫",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上风蚀沙虫掉落"
+      ]
+    },
+    "常暗圆环": {
+      "id": 113045,
+      "name": "常暗圆环",
+      "rarity": 4,
+      "boss": "深罪浸礼者",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上深罪浸礼者掉落"
+      ]
+    },
+    "奇械发条备件·歌裴莉娅": {
+      "id": 113049,
+      "name": "奇械发条备件·歌裴莉娅",
+      "rarity": 4,
+      "boss": null,
+      "supported": false,
+      "sourceTexts": [
+        "30级以上「冰风组曲」掉落"
+      ]
+    },
+    "奇械发条备件·科培琉司": {
+      "id": 113050,
+      "name": "奇械发条备件·科培琉司",
+      "rarity": 4,
+      "boss": null,
+      "supported": false,
+      "sourceTexts": [
+        "30级以上「冰风组曲」掉落"
+      ]
+    },
+    "帝皇的决断": {
+      "id": 113051,
+      "name": "帝皇的决断",
+      "rarity": 4,
+      "boss": "铁甲熔火帝皇",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上铁甲熔火帝皇掉落"
+      ]
+    },
+    "「图比昂装置」": {
+      "id": 113052,
+      "name": "「图比昂装置」",
+      "rarity": 4,
+      "boss": "实验性场力发生装置",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上实验性场力发生装置掉落"
+      ]
+    },
+    "原海麟角": {
+      "id": 113053,
+      "name": "原海麟角",
+      "rarity": 4,
+      "boss": "千年珍珠骏麟",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上千年珍珠骏麟掉落"
+      ]
+    },
+    "未能达成超越之水": {
+      "id": 113057,
+      "name": "未能达成超越之水",
+      "rarity": 4,
+      "boss": "水形幻人",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上水形幻人掉落"
+      ]
+    },
+    "凝云鳞甲": {
+      "id": 113058,
+      "name": "凝云鳞甲",
+      "rarity": 4,
+      "boss": "隐山猊兽",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上隐山猊兽掉落"
+      ]
+    },
+    "金色旋律的断章": {
+      "id": 113059,
+      "name": "金色旋律的断章",
+      "rarity": 4,
+      "boss": "魔像督军",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上魔像督军掉落"
+      ]
+    },
+    "受祝所缚之印": {
+      "id": 113064,
+      "name": "受祝所缚之印",
+      "rarity": 4,
+      "boss": "金焰绒翼龙暴君",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上金焰绒翼龙暴君掉落"
+      ]
+    },
+    "过熟的火榴果": {
+      "id": 113065,
+      "name": "过熟的火榴果",
+      "rarity": 4,
+      "boss": "贪食匿叶龙山王",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上贪食匿叶龙山王掉落"
+      ]
+    },
+    "秘刻金纹的源核": {
+      "id": 113066,
+      "name": "秘刻金纹的源核",
+      "rarity": 4,
+      "boss": "秘源机兵·构型械",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上秘源机兵·构型械掉落"
+      ]
+    },
+    "深邃纠缠的凝视": {
+      "id": 113067,
+      "name": "深邃纠缠的凝视",
+      "rarity": 4,
+      "boss": "深邃摹结株",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上深邃摹结株掉落"
+      ]
+    },
+    "谜土的护符": {
+      "id": 113071,
+      "name": "谜土的护符",
+      "rarity": 4,
+      "boss": "灵觉隐修的迷者",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上灵觉隐修的迷者掉落"
+      ]
+    },
+    "龙像的无智核": {
+      "id": 113072,
+      "name": "龙像的无智核",
+      "rarity": 4,
+      "boss": "熔岩辉龙像",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上熔岩辉龙像掉落"
+      ]
+    },
+    "秘源积气喉": {
+      "id": 113076,
+      "name": "秘源积气喉",
+      "rarity": 4,
+      "boss": "秘源机兵·统御械",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上秘源机兵·统御械掉落"
+      ]
+    },
+    "精密型月矩力冲鸭模具": {
+      "id": 113077,
+      "name": "精密型月矩力冲鸭模具",
+      "rarity": 4,
+      "boss": "重拳出击鸭",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上重拳出击鸭掉落"
+      ]
+    },
+    "承光的鳞羽": {
+      "id": 113078,
+      "name": "承光的鳞羽",
+      "rarity": 4,
+      "boss": "蕴光月幻蝶",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上蕴光月幻蝶掉落"
+      ]
+    },
+    "漫光的辉角": {
+      "id": 113079,
+      "name": "漫光的辉角",
+      "rarity": 4,
+      "boss": "霜夜巡天灵主",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上霜夜巡天灵主掉落"
+      ]
+    },
+    "循环式军用月矩核心": {
+      "id": 113080,
+      "name": "循环式军用月矩核心",
+      "rarity": 4,
+      "boss": "超重型陆巡舰·机动战垒",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上超重型陆巡舰·机动战垒掉落"
+      ]
+    },
+    "魇翼枯骸": {
+      "id": 113084,
+      "name": "魇翼枯骸",
+      "rarity": 4,
+      "boss": "深黯魇语之主",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上深黯魇语之主掉落"
+      ]
+    },
+    "棱光的断尾": {
+      "id": 113085,
+      "name": "棱光的断尾",
+      "rarity": 4,
+      "boss": "蕴光月守宫",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上蕴光月守宫掉落"
+      ]
+    },
+    "堕天的落羽": {
+      "id": 113086,
+      "name": "堕天的落羽",
+      "rarity": 4,
+      "boss": "守望者·堕天",
+      "supported": true,
+      "sourceTexts": [
+        "30级以上守望者·堕天掉落"
+      ]
+    },
+    "焰中不灭花枝": {
+      "id": 113090,
+      "name": "焰中不灭花枝",
+      "rarity": 4,
+      "boss": null,
+      "supported": false,
+      "sourceTexts": [
+        "30级以上不灭衍生造物掉落"
+      ]
+    },
+    "游空之物的断尾": {
+      "id": 113091,
+      "name": "游空之物的断尾",
+      "rarity": 4,
+      "boss": null,
+      "supported": false,
+      "sourceTexts": [
+        "30级以上嵌合翼骏狮掉落"
+      ]
+    }
+  }
+}
