@@ -18,13 +18,11 @@ import { appendArtifactFallbackTask } from './core/artifact-executor.js';
 import { switchPartyWithRecovery } from './core/party-switch.js';
 import {
   assertExecutionConfirmed,
-  isTrainingGuideMode,
-  isTrainingGuidePreviewMode,
   normalizeScriptSettings,
   validateBossOverrideNames,
 } from './core/settings.js';
 import { readTrainingGuideSnapshot } from './guide-reader/index.js';
-import { buildGuideTargetData } from './core/guide-targets.js';
+import { appendGuideTargetData, buildGuideTargetData } from './core/guide-targets.js';
 import {
   createExecutionOutcome,
   createRunExecution,
@@ -45,19 +43,17 @@ const failureNotificationState = { settings: null, stage: '初始化' };
 
 async function main() {
   let scriptSettings;
-  let guidePreviewOnly = false;
   try {
     scriptSettings = normalizeScriptSettings(settings);
     scriptSettings.resinPolicyV2 = compileResinPolicyV2(scriptSettings);
-    guidePreviewOnly = isTrainingGuidePreviewMode(scriptSettings);
-    if (!guidePreviewOnly) assertExecutionConfirmed(scriptSettings);
+    assertExecutionConfirmed(scriptSettings);
   } catch (error) {
     log.error('[配置] {message}', error?.message ?? String(error));
     throw withExecutionContext(error, { code: 'config_invalid', stage: 'preflight' });
   }
   const executionEnabled = true;
-  failureNotificationState.settings = guidePreviewOnly ? null : scriptSettings;
-  log.info('[模式] {mode}', guidePreviewOnly ? '提升指南仅预览，不执行刷取任务' : '已确认配置，进入实际执行模式');
+  failureNotificationState.settings = scriptSettings;
+  log.info('[模式] 已确认配置，进入实际执行模式');
 
   failureNotificationState.stage = '读取培养目标';
   const materials = JSON.parse(file.readTextSync('data/materials.json'));
@@ -74,23 +70,13 @@ async function main() {
   let targetData;
   let profileRecord = null;
   let guideRecord = null;
-  if (isTrainingGuideMode(scriptSettings)) {
-    try {
-      const snapshot = await readTrainingGuideSnapshot();
-      const identities = JSON.parse(file.readTextSync('guide-reader/data/guide-identities.json'));
-      const service = typeof characterDevelopmentTask === 'undefined' ? null : characterDevelopmentTask;
-      targetData = await buildGuideTargetData({ snapshot, identities, rulebook, service });
-      guideRecord = targetData.guide;
-      await file.writeText('record/latest-guide.json', JSON.stringify(targetData, null, 2), false);
-      for (const line of targetData.targetSummary) log.info('[提升指南] {summary}', line);
-      if (guidePreviewOnly) {
-        log.info('[提升指南] 仅预览模式已完成；目标已保存到 record/latest-guide.json，未读取背包、未执行刷取任务、未发送通知');
-        return;
-      }
-    } catch (error) {
-      log.error('[提升指南] {message}', error?.message ?? String(error));
-      throw withExecutionContext(error, { code: 'guide_invalid', stage: 'profile' });
-    }
+  let originalConfigured = false;
+  let deferredProfilePreview = false;
+  let originalProfileCoversGuide = false;
+  if (isAutomaticProfileMode(scriptSettings) && isEmptyGuideOnlySelection(scriptSettings)) {
+    targetData = { targets: [], inventory: {} };
+    deferredProfilePreview = scriptSettings.targetInputMode === '自动档案仅预览';
+    log.info('[自动档案] 未选择原计划角色或武器；本次仅附加提升指南目标');
   } else if (isAutomaticProfileMode(scriptSettings)) {
     try {
       const request = prepareAutomaticProfileRequest(scriptSettings, rulebook);
@@ -100,6 +86,7 @@ async function main() {
       if (request.requiresProfile) {
         try {
           profile = await readCharacterProfile(service, request);
+          originalProfileCoversGuide = request.categories === '属性;武器;天赋';
         } catch (error) {
           if (request.cultivationMode !== '培养角色和指定武器') throw error;
           profileError = error;
@@ -112,6 +99,7 @@ async function main() {
         throw new Error(`没有可继续处理的培养目标：${failedOutcomes.map((outcome) => outcome.message).join('；')}`);
       }
       targetData = { targets: generated.targets, inventory: {} };
+      originalConfigured = true;
       profileRecord = {
         mode: scriptSettings.targetInputMode,
         cultivationMode: request.cultivationMode,
@@ -134,8 +122,11 @@ async function main() {
       }
       log.info('[自动档案] 已保存识别记录：record/latest-profile.json');
       if (request.previewOnly) {
-        log.info('[自动档案] 仅预览模式已完成；未读取背包、未执行刷取任务、未发送通知');
-        return;
+        if (scriptSettings.appendTrainingGuide !== true) {
+          log.info('[自动档案] 仅预览模式已完成；未读取背包、未执行刷取任务、未发送通知');
+          return;
+        }
+        deferredProfilePreview = true;
       }
     } catch (error) {
       const code = /未提供 characterDevelopmentTask\.GetCharacter/.test(error?.message ?? '')
@@ -146,9 +137,68 @@ async function main() {
     }
   } else {
     targetData = loadTargets(scriptSettings, rulebook);
+    originalConfigured = Array.isArray(targetData.targets) && targetData.targets.length > 0;
   }
-  const targetSummary = targetData.targetSummary ?? profileRecord?.targetSummary ?? buildTargetSummary(targetData.targets ?? []);
-  const targetOutcomes = targetData.targetOutcomes ?? profileRecord?.targetOutcomes ?? [];
+  const originalTargetData = targetData;
+  const originalTargetSummary = profileRecord?.targetSummary ?? buildTargetSummary(targetData.targets ?? []);
+  const originalTargetOutcomes = profileRecord?.targetOutcomes ?? [];
+  let targetSummary = originalTargetSummary;
+  let targetOutcomes = originalTargetOutcomes;
+  if (scriptSettings.appendTrainingGuide === true) {
+    try {
+      const snapshot = await readTrainingGuideSnapshot();
+      const identities = JSON.parse(file.readTextSync('guide-reader/data/guide-identities.json'));
+      const service = typeof characterDevelopmentTask === 'undefined' ? null : characterDevelopmentTask;
+      const profilesByCharacter = originalProfileCoversGuide && profileRecord?.profile?.characterName
+        ? { [profileRecord.profile.characterName]: profileRecord.profile }
+        : {};
+      const guideTargetData = await buildGuideTargetData({
+        snapshot,
+        identities,
+        rulebook,
+        service,
+        profilesByCharacter,
+      });
+      const combined = appendGuideTargetData({
+        originalTargetData,
+        guideTargetData,
+        originalTargetSummary,
+        originalTargetOutcomes,
+      });
+      targetData = combined.targetData;
+      targetSummary = combined.targetSummary;
+      targetOutcomes = combined.targetOutcomes;
+      guideRecord = combined.guide;
+      await file.writeText('record/latest-guide.json', JSON.stringify({
+        guide: combined.guide,
+        profiles: guideTargetData.profiles,
+        targets: targetData.targets,
+        targetSummary,
+        targetOutcomes,
+        appendedGuideTargets: combined.appendedGuideTargets,
+        skippedGuideTargets: combined.skippedGuideTargets,
+      }, null, 2), false);
+      for (const line of guideTargetData.targetSummary) log.info('[提升指南] {summary}', line);
+      if (combined.skippedGuideTargets.length > 0) {
+        log.info('[提升指南] 原计划优先，已跳过 {count} 个同名同类目标', combined.skippedGuideTargets.length);
+      }
+      log.info('[提升指南] 已附加 {count} 个目标并保存组合计划：record/latest-guide.json', combined.appendedGuideTargets.length);
+    } catch (error) {
+      if (!originalConfigured) {
+        log.error('[提升指南] {message}', error?.message ?? String(error));
+        throw withExecutionContext(error, { code: 'guide_invalid', stage: 'profile' });
+      }
+      targetData = originalTargetData;
+      targetSummary = originalTargetSummary;
+      targetOutcomes = originalTargetOutcomes;
+      guideRecord = null;
+      log.warn('[提升指南] 附加失败，本次继续使用原计划：{message}', error?.message ?? String(error));
+    }
+    if (deferredProfilePreview) {
+      log.info('[自动档案] 组合目标预览已完成；未读取背包、未执行刷取任务、未发送通知');
+      return;
+    }
+  }
   const sourceCandidates = JSON.parse(file.readTextSync('data/source-candidates.json'));
   const routeOverrides = JSON.parse(file.readTextSync('data/route-overrides.json'));
   const today = resolvePlanningWeekday({
@@ -609,6 +659,15 @@ function loadTargets(scriptSettings, rulebook) {
   const targetFile = scriptSettings.targetFile || 'data/user-targets.json';
   log.info('[初始化] 读取高级目标文件：{path}', targetFile);
   return JSON.parse(file.readTextSync(targetFile));
+}
+
+/** 未选择任何原计划角色或武器时，把勾选指南解释为纯指南计划。 */
+function isEmptyGuideOnlySelection(scriptSettings) {
+  if (scriptSettings.appendTrainingGuide !== true || scriptSettings.customTargetsEnabled === true) return false;
+  const characterName = String(scriptSettings.selectedCharacter ?? '').trim();
+  const weaponName = String(scriptSettings.selectedWeapon ?? '').trim();
+  return (!characterName || characterName === '不选择角色')
+    && (!weaponName || weaponName === '不选择武器');
 }
 
 function attachTargetContext(plan, profile, targetSummary, guide = null, targetOutcomes = null) {

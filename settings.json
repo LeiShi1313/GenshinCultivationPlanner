@@ -2,7 +2,7 @@
   {
     "name": "basicSection",
     "type": "separator",
-    "label": "【角色一键养成】默认读取游戏内提升指南，自动计算、匹配并刷取材料。需要 BetterGI 0.64+ 和 OCR V6。"
+    "label": "【角色一键养成】选择角色和目标后，自动计算、匹配并刷取材料。需要 BetterGI 0.64+ 和 OCR V6。"
   },
   {
     "name": "executionConfirmed",
@@ -15,17 +15,15 @@
     "type": "select",
     "label": "运行方式",
     "options": [
-      "提升指南预览（不执行）",
-      "读取提升指南并执行",
       "预览目标（不执行）",
       "读取档案并执行"
     ],
-    "default": "读取提升指南并执行"
+    "default": "读取档案并执行"
   },
   {
     "name": "autoWeaponMode",
     "type": "select",
-    "label": "自动档案培养内容（自动档案模式生效）",
+    "label": "培养内容",
     "options": [
       "培养角色和当前佩戴武器",
       "培养角色和指定武器",
@@ -37,7 +35,7 @@
   {
     "name": "selectedCharacter",
     "type": "cascade-select",
-    "label": "自动档案培养角色（仅培养指定武器时可不选）",
+    "label": "培养角色（仅培养指定武器时可不选）",
     "cascadeOptions": {
       "不使用下拉选择": [
         "不选择角色"
@@ -182,7 +180,7 @@
   {
     "name": "automaticTargetSection",
     "type": "separator",
-    "label": "\n━━━━━━━━━━━━━━━━ 自动档案培养目标 ━━━━━━━━━━━━━━━━\n以下设置仅用于自动档案模式。等级未标注“已突破”时，按突破前计算。"
+    "label": "\n━━━━━━━━━━━━━━━━━━━━ 培养目标 ━━━━━━━━━━━━━━━━━━━━\n等级未标注“已突破”时，按突破前计算。"
   },
   {
     "name": "autoCharacterTargetLevel",
@@ -578,6 +576,12 @@
       ]
     },
     "default": "80>90"
+  },
+  {
+    "name": "appendTrainingGuide",
+    "type": "checkbox",
+    "label": "附加提升指南培养计划（默认关闭）",
+    "default": false
   },
   {
     "name": "domainSection",

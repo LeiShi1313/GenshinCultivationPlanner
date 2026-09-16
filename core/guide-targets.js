@@ -1,4 +1,4 @@
-import { buildAutomaticProfileTargets, readCharacterProfile } from './character-profile.js';
+import { buildAutomaticProfileTargets, buildTargetSummary, readCharacterProfile } from './character-profile.js';
 
 const MAX_GUIDE_AGE_MS = 5 * 60 * 1000;
 const TALENT_SLOT_KEYS = Object.freeze({
@@ -13,6 +13,7 @@ export async function buildGuideTargetData({
   identities,
   rulebook,
   service,
+  profilesByCharacter = {},
   nowMs = Date.now(),
 }) {
   const { collection, preview } = requireFreshGuideSnapshot(snapshot, nowMs);
@@ -23,10 +24,14 @@ export async function buildGuideTargetData({
   const profiles = [];
 
   for (const request of requests) {
-    const profile = await readCharacterProfile(service, {
+    const cachedProfile = profilesByCharacter?.[request.characterName];
+    const profile = cachedProfile ?? await readCharacterProfile(service, {
       characterName: request.characterName,
       categories: '属性;武器;天赋',
     });
+    if (profile?.characterName !== request.characterName) {
+      throw new Error(`角色档案返回“${profile?.characterName ?? '未知角色'}”，与提升指南“${request.characterName}”不一致`);
+    }
     const settings = buildProfileSettings(request, profile);
     const generated = buildAutomaticProfileTargets(profile, settings, rulebook, {
       characterName: request.characterName,
@@ -58,6 +63,70 @@ export async function buildGuideTargetData({
       targetRequests: requests,
     },
   };
+}
+
+/** Append non-duplicate guide targets without changing original targets or inventory. */
+export function appendGuideTargetData({
+  originalTargetData,
+  guideTargetData,
+  originalTargetSummary = [],
+  originalTargetOutcomes = [],
+}) {
+  const originalTargets = requireTargets(originalTargetData, '原有培养目标');
+  const guideTargets = requireTargets(guideTargetData, '提升指南培养目标');
+  const originalOutcomes = Array.isArray(originalTargetOutcomes) ? originalTargetOutcomes : [];
+  const seen = new Set([...originalTargets, ...originalOutcomes]
+    .map((target) => targetIdentity(target)).filter(Boolean));
+  const appendedGuideTargets = [];
+  const skippedGuideTargets = [];
+
+  for (const target of guideTargets) {
+    const identity = targetIdentity(target);
+    if (!identity) throw new Error('提升指南生成了缺少类型或名称的目标');
+    if (seen.has(identity)) {
+      skippedGuideTargets.push(target);
+      continue;
+    }
+    seen.add(identity);
+    appendedGuideTargets.push({ ...target });
+  }
+
+  const appendedIdentities = new Set(appendedGuideTargets.map(targetIdentity));
+  const guideOutcomes = Array.isArray(guideTargetData?.targetOutcomes)
+    ? guideTargetData.targetOutcomes.filter((outcome) => appendedIdentities.has(targetIdentity(outcome))) : [];
+  const targetSummary = [
+    ...(Array.isArray(originalTargetSummary) ? originalTargetSummary : []),
+    ...buildTargetSummary(appendedGuideTargets),
+  ];
+  return {
+    targetData: {
+      ...originalTargetData,
+      targets: [...originalTargets, ...appendedGuideTargets],
+    },
+    targetSummary,
+    targetOutcomes: [
+      ...originalOutcomes,
+      ...guideOutcomes,
+    ],
+    guide: {
+      ...guideTargetData.guide,
+      appendedTargets: appendedGuideTargets.map((target) => ({ kind: target.kind, name: target.name })),
+      skippedTargets: skippedGuideTargets.map((target) => ({ kind: target.kind, name: target.name })),
+    },
+    appendedGuideTargets,
+    skippedGuideTargets,
+  };
+}
+
+function requireTargets(targetData, label) {
+  if (!targetData || !Array.isArray(targetData.targets)) throw new Error(`${label}无效`);
+  return targetData.targets;
+}
+
+function targetIdentity(target) {
+  return typeof target?.kind === 'string' && target.kind
+    && typeof target?.name === 'string' && target.name
+    ? `${target.kind}\u0000${target.name}` : null;
 }
 
 function requireFreshGuideSnapshot(snapshot, nowMs) {
