@@ -110,7 +110,11 @@ function mergeDomainTasks(tasks) {
       grouped.set(`single:${task.materialId}`, task);
       continue;
     }
-    const key = `${task.executionType}:${targetName}`;
+    const baseKey = `${task.executionType}:${targetName}`;
+    // 周日同一秘境可选不同奖励组；未标组的旧秘境与 Boss 继续沿用原分组键。
+    const key = task.executionType === 'domain' && task.sundaySelectedValue
+      ? `${baseKey}:reward:${task.sundaySelectedValue}`
+      : baseKey;
     const existing = grouped.get(key);
     const material = { materialId: task.materialId, materialName: task.materialName, shortage: task.shortage };
     if (existing) {
