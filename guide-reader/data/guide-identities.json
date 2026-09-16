@@ -1,6 +1,5 @@
 {
   "schemaVersion": 1,
-  "purpose": "Exact identity allowlist for Training Guide character, upgradeable combat-skill, and equipped-weapon OCR. It contains no planning or orchestration logic.",
   "source": {
     "repository": "https://github.com/theBowja/genshin-db",
     "commit": "8b15995fa220c88a4d0d7ffe1e21b041d0b32588",
@@ -8,29 +7,11 @@
     "gameDataVersion": "7.0",
     "locale": "ChineseSimplified",
     "license": "MIT",
-    "licenseFile": "LICENSE.genshin-db",
-    "recordBaseUrl": "https://github.com/theBowja/genshin-db/blob/8b15995fa220c88a4d0d7ffe1e21b041d0b32588/"
-  },
-  "matching": {
-    "mode": "exact",
-    "normalization": "none",
-    "upgradeableSlots": [
-      "combat1",
-      "combat2",
-      "combat3"
-    ],
-    "guideRowCoverage": "The guide can display any 1-3 configured combat skills; absence from a page is not identity evidence.",
-    "traveler": "空 and 荧 intentionally retain every elemental talent variant; callers must resolve the live element from current evidence and must not auto-select a variant.",
-    "weapons": "Each canonical name maps to source candidates because the pinned data contains three distinct IDs named 「一心传」名刀; a name match validates spelling but does not resolve that duplicate identity.",
-    "displayLabels": "canonicalName preserves the pinned raw combat skill name. No prefix stripping, punctuation rewriting, aliasing, or fuzzy matching is defined. observedGuideSamples covers only names actually seen in saved guide evidence."
+    "licenseFile": "THIRD_PARTY_NOTICES.md"
   },
   "characters": {
     "七七": {
-      "characterId": 10000035,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/qiqi.json",
       "talentIdentity": "exact",
-      "talentId": 3501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/qiqi.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -47,11 +28,7 @@
       ]
     },
     "丝柯克": {
-      "characterId": 10000114,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/skirk.json",
       "talentIdentity": "exact",
-      "talentId": 11401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/skirk.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -68,11 +45,7 @@
       ]
     },
     "丽莎": {
-      "characterId": 10000006,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/lisa.json",
       "talentIdentity": "exact",
-      "talentId": 601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/lisa.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -89,11 +62,7 @@
       ]
     },
     "久岐忍": {
-      "characterId": 10000065,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kukishinobu.json",
       "talentIdentity": "exact",
-      "talentId": 6501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kukishinobu.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -110,11 +79,7 @@
       ]
     },
     "九条裟罗": {
-      "characterId": 10000056,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kujousara.json",
       "talentIdentity": "exact",
-      "talentId": 5601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kujousara.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -131,11 +96,7 @@
       ]
     },
     "云堇": {
-      "characterId": 10000064,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/yunjin.json",
       "talentIdentity": "exact",
-      "talentId": 6401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/yunjin.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -152,11 +113,7 @@
       ]
     },
     "五郎": {
-      "characterId": 10000055,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/gorou.json",
       "talentIdentity": "exact",
-      "talentId": 5501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/gorou.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -173,11 +130,7 @@
       ]
     },
     "伊安珊": {
-      "characterId": 10000110,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/iansan.json",
       "talentIdentity": "exact",
-      "talentId": 11001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/iansan.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -194,11 +147,7 @@
       ]
     },
     "伊法": {
-      "characterId": 10000113,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/ifa.json",
       "talentIdentity": "exact",
-      "talentId": 11301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/ifa.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -215,11 +164,7 @@
       ]
     },
     "伊涅芙": {
-      "characterId": 10000116,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/ineffa.json",
       "talentIdentity": "exact",
-      "talentId": 11601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/ineffa.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -236,11 +181,7 @@
       ]
     },
     "优菈": {
-      "characterId": 10000051,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/eula.json",
       "talentIdentity": "exact",
-      "talentId": 5101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/eula.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -257,11 +198,7 @@
       ]
     },
     "克洛琳德": {
-      "characterId": 10000098,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/clorinde.json",
       "talentIdentity": "exact",
-      "talentId": 9801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/clorinde.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -278,11 +215,7 @@
       ]
     },
     "八重神子": {
-      "characterId": 10000058,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/yaemiko.json",
       "talentIdentity": "exact",
-      "talentId": 5801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/yaemiko.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -299,11 +232,7 @@
       ]
     },
     "兹白": {
-      "characterId": 10000126,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/zibai.json",
       "talentIdentity": "exact",
-      "talentId": 12601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/zibai.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -320,11 +249,7 @@
       ]
     },
     "凝光": {
-      "characterId": 10000027,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/ningguang.json",
       "talentIdentity": "exact",
-      "talentId": 2701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/ningguang.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -341,11 +266,7 @@
       ]
     },
     "凯亚": {
-      "characterId": 10000015,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kaeya.json",
       "talentIdentity": "exact",
-      "talentId": 1501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kaeya.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -362,11 +283,7 @@
       ]
     },
     "刻晴": {
-      "characterId": 10000042,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/keqing.json",
       "talentIdentity": "exact",
-      "talentId": 4201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/keqing.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -383,11 +300,7 @@
       ]
     },
     "北斗": {
-      "characterId": 10000024,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/beidou.json",
       "talentIdentity": "exact",
-      "talentId": 2401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/beidou.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -404,11 +317,7 @@
       ]
     },
     "千织": {
-      "characterId": 10000094,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/chiori.json",
       "talentIdentity": "exact",
-      "talentId": 9401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/chiori.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -425,11 +334,7 @@
       ]
     },
     "卡维": {
-      "characterId": 10000081,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kaveh.json",
       "talentIdentity": "exact",
-      "talentId": 8101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kaveh.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -446,11 +351,7 @@
       ]
     },
     "卡齐娜": {
-      "characterId": 10000100,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kachina.json",
       "talentIdentity": "exact",
-      "talentId": 10001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kachina.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -467,11 +368,7 @@
       ]
     },
     "可莉": {
-      "characterId": 10000029,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/klee.json",
       "talentIdentity": "exact",
-      "talentId": 2901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/klee.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -488,11 +385,7 @@
       ]
     },
     "叶洛亚": {
-      "characterId": 10000127,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/illuga.json",
       "talentIdentity": "exact",
-      "talentId": 12701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/illuga.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -509,11 +402,7 @@
       ]
     },
     "哥伦比娅": {
-      "characterId": 10000125,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/columbina.json",
       "talentIdentity": "exact",
-      "talentId": 12501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/columbina.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -530,11 +419,7 @@
       ]
     },
     "嘉明": {
-      "characterId": 10000092,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/gaming.json",
       "talentIdentity": "exact",
-      "talentId": 9201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/gaming.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -551,11 +436,7 @@
       ]
     },
     "坎蒂丝": {
-      "characterId": 10000072,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/candace.json",
       "talentIdentity": "exact",
-      "talentId": 7201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/candace.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -572,11 +453,7 @@
       ]
     },
     "埃洛伊": {
-      "characterId": 10000062,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/aloy.json",
       "talentIdentity": "exact",
-      "talentId": 6201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/aloy.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -593,11 +470,7 @@
       ]
     },
     "基尼奇": {
-      "characterId": 10000101,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kinich.json",
       "talentIdentity": "exact",
-      "talentId": 10101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kinich.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -614,11 +487,7 @@
       ]
     },
     "塔利雅": {
-      "characterId": 10000115,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/dahlia.json",
       "talentIdentity": "exact",
-      "talentId": 11501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/dahlia.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -635,11 +504,7 @@
       ]
     },
     "夏沃蕾": {
-      "characterId": 10000090,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/chevreuse.json",
       "talentIdentity": "exact",
-      "talentId": 9001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/chevreuse.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -656,11 +521,7 @@
       ]
     },
     "夏洛蒂": {
-      "characterId": 10000088,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/charlotte.json",
       "talentIdentity": "exact",
-      "talentId": 8801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/charlotte.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -677,11 +538,7 @@
       ]
     },
     "多莉": {
-      "characterId": 10000068,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/dori.json",
       "talentIdentity": "exact",
-      "talentId": 6801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/dori.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -698,11 +555,7 @@
       ]
     },
     "夜兰": {
-      "characterId": 10000060,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/yelan.json",
       "talentIdentity": "exact",
-      "talentId": 6001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/yelan.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -719,23 +572,13 @@
       ]
     },
     "奇偶·女性": {
-      "characterId": 10000118,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/manekina.json",
-      "talentIdentity": "unavailable",
-      "reason": "No same-name or same-file talent record exists at the pinned commit."
+      "talentIdentity": "unavailable"
     },
     "奇偶·男性": {
-      "characterId": 10000117,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/manekin.json",
-      "talentIdentity": "unavailable",
-      "reason": "No same-name or same-file talent record exists at the pinned commit."
+      "talentIdentity": "unavailable"
     },
     "奈芙尔": {
-      "characterId": 10000122,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/nefer.json",
       "talentIdentity": "exact",
-      "talentId": 12201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/nefer.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -752,11 +595,7 @@
       ]
     },
     "奥黛塔": {
-      "characterId": 10000150,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/odette.json",
       "talentIdentity": "exact",
-      "talentId": 15001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/odette.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -773,11 +612,7 @@
       ]
     },
     "妮露": {
-      "characterId": 10000070,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/nilou.json",
       "talentIdentity": "exact",
-      "talentId": 7001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/nilou.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -794,11 +629,7 @@
       ]
     },
     "娜维娅": {
-      "characterId": 10000091,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/navia.json",
       "talentIdentity": "exact",
-      "talentId": 9101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/navia.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -815,11 +646,7 @@
       ]
     },
     "安柏": {
-      "characterId": 10000021,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/amber.json",
       "talentIdentity": "exact",
-      "talentId": 2101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/amber.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -836,11 +663,7 @@
       ]
     },
     "宵宫": {
-      "characterId": 10000049,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/yoimiya.json",
       "talentIdentity": "exact",
-      "talentId": 4901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/yoimiya.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -857,11 +680,7 @@
       ]
     },
     "尼可": {
-      "characterId": 10000131,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/nicole.json",
       "talentIdentity": "exact",
-      "talentId": 13101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/nicole.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -878,11 +697,7 @@
       ]
     },
     "布伦妮": {
-      "characterId": 10000132,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/prune.json",
       "talentIdentity": "exact",
-      "talentId": 13201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/prune.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -899,11 +714,7 @@
       ]
     },
     "希格雯": {
-      "characterId": 10000095,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/sigewinne.json",
       "talentIdentity": "exact",
-      "talentId": 9501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/sigewinne.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -920,11 +731,7 @@
       ]
     },
     "希诺宁": {
-      "characterId": 10000103,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/xilonen.json",
       "talentIdentity": "exact",
-      "talentId": 10301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/xilonen.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -941,11 +748,7 @@
       ]
     },
     "恰斯卡": {
-      "characterId": 10000104,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/chasca.json",
       "talentIdentity": "exact",
-      "talentId": 10401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/chasca.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -962,11 +765,7 @@
       ]
     },
     "托马": {
-      "characterId": 10000050,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/thoma.json",
       "talentIdentity": "exact",
-      "talentId": 5001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/thoma.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -983,11 +782,7 @@
       ]
     },
     "提纳里": {
-      "characterId": 10000069,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/tighnari.json",
       "talentIdentity": "exact",
-      "talentId": 6901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/tighnari.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1004,11 +799,7 @@
       ]
     },
     "早柚": {
-      "characterId": 10000053,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/sayu.json",
       "talentIdentity": "exact",
-      "talentId": 5301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/sayu.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1025,11 +816,7 @@
       ]
     },
     "杜林": {
-      "characterId": 10000123,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/durin.json",
       "talentIdentity": "exact",
-      "talentId": 12301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/durin.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1046,11 +833,7 @@
       ]
     },
     "林尼": {
-      "characterId": 10000084,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/lyney.json",
       "talentIdentity": "exact",
-      "talentId": 8401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/lyney.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1067,11 +850,7 @@
       ]
     },
     "枫原万叶": {
-      "characterId": 10000047,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kaedeharakazuha.json",
       "talentIdentity": "exact",
-      "talentId": 4701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kaedeharakazuha.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1088,11 +867,7 @@
       ]
     },
     "柯莱": {
-      "characterId": 10000067,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/collei.json",
       "talentIdentity": "exact",
-      "talentId": 6701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/collei.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1109,11 +884,7 @@
       ]
     },
     "桑多涅": {
-      "characterId": 10000133,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/sandrone.json",
       "talentIdentity": "exact",
-      "talentId": 13301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/sandrone.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1130,11 +901,7 @@
       ]
     },
     "梦见月瑞希": {
-      "characterId": 10000109,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/yumemizukimizuki.json",
       "talentIdentity": "exact",
-      "talentId": 10901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/yumemizukimizuki.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1151,11 +918,7 @@
       ]
     },
     "欧洛伦": {
-      "characterId": 10000105,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/ororon.json",
       "talentIdentity": "exact",
-      "talentId": 10501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/ororon.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1172,11 +935,7 @@
       ]
     },
     "法尔伽": {
-      "characterId": 10000128,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/varka.json",
       "talentIdentity": "exact",
-      "talentId": 12801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/varka.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1193,11 +952,7 @@
       ]
     },
     "洛恩": {
-      "characterId": 10000129,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/lohen.json",
       "talentIdentity": "exact",
-      "talentId": 12901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/lohen.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1214,11 +969,7 @@
       ]
     },
     "流浪者": {
-      "characterId": 10000075,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/wanderer.json",
       "talentIdentity": "exact",
-      "talentId": 7501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/wanderer.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1235,11 +986,7 @@
       ]
     },
     "温迪": {
-      "characterId": 10000022,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/venti.json",
       "talentIdentity": "exact",
-      "talentId": 2201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/venti.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1256,11 +1003,7 @@
       ]
     },
     "烟绯": {
-      "characterId": 10000048,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/yanfei.json",
       "talentIdentity": "exact",
-      "talentId": 4801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/yanfei.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1277,11 +1020,7 @@
       ]
     },
     "爱可菲": {
-      "characterId": 10000112,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/escoffier.json",
       "talentIdentity": "exact",
-      "talentId": 11201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/escoffier.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1298,11 +1037,7 @@
       ]
     },
     "爱诺": {
-      "characterId": 10000121,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/aino.json",
       "talentIdentity": "exact",
-      "talentId": 12101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/aino.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1319,11 +1054,7 @@
       ]
     },
     "玛拉妮": {
-      "characterId": 10000102,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/mualani.json",
       "talentIdentity": "exact",
-      "talentId": 10201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/mualani.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1340,11 +1071,7 @@
       ]
     },
     "玛薇卡": {
-      "characterId": 10000106,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/mavuika.json",
       "talentIdentity": "exact",
-      "talentId": 10601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/mavuika.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1361,11 +1088,7 @@
       ]
     },
     "珊瑚宫心海": {
-      "characterId": 10000054,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/sangonomiyakokomi.json",
       "talentIdentity": "exact",
-      "talentId": 5401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/sangonomiyakokomi.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1382,11 +1105,7 @@
       ]
     },
     "珐露珊": {
-      "characterId": 10000076,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/faruzan.json",
       "talentIdentity": "exact",
-      "talentId": 7601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/faruzan.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1403,11 +1122,7 @@
       ]
     },
     "班尼特": {
-      "characterId": 10000032,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/bennett.json",
       "talentIdentity": "exact",
-      "talentId": 3201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/bennett.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1424,11 +1139,7 @@
       ]
     },
     "琳妮特": {
-      "characterId": 10000083,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/lynette.json",
       "talentIdentity": "exact",
-      "talentId": 8301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/lynette.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1445,11 +1156,7 @@
       ]
     },
     "琴": {
-      "characterId": 10000003,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/jean.json",
       "talentIdentity": "exact",
-      "talentId": 301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/jean.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1466,11 +1173,7 @@
       ]
     },
     "瑶瑶": {
-      "characterId": 10000077,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/yaoyao.json",
       "talentIdentity": "exact",
-      "talentId": 7701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/yaoyao.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1487,11 +1190,7 @@
       ]
     },
     "瓦雷莎": {
-      "characterId": 10000111,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/varesa.json",
       "talentIdentity": "exact",
-      "talentId": 11101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/varesa.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1508,11 +1207,7 @@
       ]
     },
     "甘雨": {
-      "characterId": 10000037,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/ganyu.json",
       "talentIdentity": "exact",
-      "talentId": 3701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/ganyu.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1529,11 +1224,7 @@
       ]
     },
     "申鹤": {
-      "characterId": 10000063,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/shenhe.json",
       "talentIdentity": "exact",
-      "talentId": 6301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/shenhe.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1550,11 +1241,7 @@
       ]
     },
     "白术": {
-      "characterId": 10000082,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/baizhu.json",
       "talentIdentity": "exact",
-      "talentId": 8201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/baizhu.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1571,11 +1258,7 @@
       ]
     },
     "砂糖": {
-      "characterId": 10000043,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/sucrose.json",
       "talentIdentity": "exact",
-      "talentId": 4301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/sucrose.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1592,11 +1275,7 @@
       ]
     },
     "神里绫人": {
-      "characterId": 10000066,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kamisatoayato.json",
       "talentIdentity": "exact",
-      "talentId": 6601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kamisatoayato.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1613,11 +1292,7 @@
       ]
     },
     "神里绫华": {
-      "characterId": 10000002,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kamisatoayaka.json",
       "talentIdentity": "exact",
-      "talentId": 201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kamisatoayaka.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1634,151 +1309,10 @@
       ]
     },
     "空": {
-      "characterId": 10000005,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/aether.json",
-      "talentIdentity": "ambiguous-traveler-element",
-      "variantCandidates": [
-        {
-          "variantName": "旅行者 (风元素)",
-          "talentId": 704,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/traveleranemo.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦铁风"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "风涡剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "风息激荡"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (冰元素)",
-          "talentId": 705,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelercryo.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦寒芒"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "冰雾剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "聚冰成锋"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (草元素)",
-          "talentId": 708,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelerdendro.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦草翦"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "草缘剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "偃草若化"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (雷元素)",
-          "talentId": 707,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelerelectro.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦惊雷"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "雷影剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "雷轰电转"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (岩元素)",
-          "talentId": 706,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelergeo.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦岩锋"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "星陨剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "岩潮叠嶂"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (水元素)",
-          "talentId": 703,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelerhydro.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦激流"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "水纹剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "扬水制流"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (火元素)",
-          "talentId": 702,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelerpyro.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦烈焰"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "流火剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "灼火燎原"
-            }
-          ]
-        }
-      ]
+      "talentIdentity": "ambiguous-traveler-element"
     },
     "米卡": {
-      "characterId": 10000080,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/mika.json",
       "talentIdentity": "exact",
-      "talentId": 8001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/mika.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1795,11 +1329,7 @@
       ]
     },
     "纳西妲": {
-      "characterId": 10000073,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/nahida.json",
       "talentIdentity": "exact",
-      "talentId": 7301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/nahida.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1816,11 +1346,7 @@
       ]
     },
     "绮良良": {
-      "characterId": 10000061,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/kirara.json",
       "talentIdentity": "exact",
-      "talentId": 6101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/kirara.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1837,11 +1363,7 @@
       ]
     },
     "罗莎莉亚": {
-      "characterId": 10000045,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/rosaria.json",
       "talentIdentity": "exact",
-      "talentId": 4501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/rosaria.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1858,11 +1380,7 @@
       ]
     },
     "胡桃": {
-      "characterId": 10000046,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/hutao.json",
       "talentIdentity": "exact",
-      "talentId": 4601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/hutao.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1879,11 +1397,7 @@
       ]
     },
     "艾尔海森": {
-      "characterId": 10000078,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/alhaitham.json",
       "talentIdentity": "exact",
-      "talentId": 7801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/alhaitham.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1900,11 +1414,7 @@
       ]
     },
     "艾梅莉埃": {
-      "characterId": 10000099,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/emilie.json",
       "talentIdentity": "exact",
-      "talentId": 9901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/emilie.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1921,11 +1431,7 @@
       ]
     },
     "芙宁娜": {
-      "characterId": 10000089,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/furina.json",
       "talentIdentity": "exact",
-      "talentId": 8901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/furina.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1942,11 +1448,7 @@
       ]
     },
     "芭芭拉": {
-      "characterId": 10000014,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/barbara.json",
       "talentIdentity": "exact",
-      "talentId": 1401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/barbara.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1963,11 +1465,7 @@
       ]
     },
     "茜特菈莉": {
-      "characterId": 10000107,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/citlali.json",
       "talentIdentity": "exact",
-      "talentId": 10701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/citlali.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -1984,11 +1482,7 @@
       ]
     },
     "荒泷一斗": {
-      "characterId": 10000057,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/aratakiitto.json",
       "talentIdentity": "exact",
-      "talentId": 5701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/aratakiitto.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2005,151 +1499,10 @@
       ]
     },
     "荧": {
-      "characterId": 10000007,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/lumine.json",
-      "talentIdentity": "ambiguous-traveler-element",
-      "variantCandidates": [
-        {
-          "variantName": "旅行者 (风元素)",
-          "talentId": 704,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/traveleranemo.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦铁风"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "风涡剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "风息激荡"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (冰元素)",
-          "talentId": 705,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelercryo.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦寒芒"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "冰雾剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "聚冰成锋"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (草元素)",
-          "talentId": 708,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelerdendro.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦草翦"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "草缘剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "偃草若化"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (雷元素)",
-          "talentId": 707,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelerelectro.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦惊雷"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "雷影剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "雷轰电转"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (岩元素)",
-          "talentId": 706,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelergeo.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦岩锋"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "星陨剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "岩潮叠嶂"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (水元素)",
-          "talentId": 703,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelerhydro.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦激流"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "水纹剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "扬水制流"
-            }
-          ]
-        },
-        {
-          "variantName": "旅行者 (火元素)",
-          "talentId": 702,
-          "talentSourceFile": "src/data/ChineseSimplified/talents/travelerpyro.json",
-          "combatSkills": [
-            {
-              "slot": "combat1",
-              "canonicalName": "异邦烈焰"
-            },
-            {
-              "slot": "combat2",
-              "canonicalName": "流火剑"
-            },
-            {
-              "slot": "combat3",
-              "canonicalName": "灼火燎原"
-            }
-          ]
-        }
-      ]
+      "talentIdentity": "ambiguous-traveler-element"
     },
     "莉奈娅": {
-      "characterId": 10000130,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/linnea.json",
       "talentIdentity": "exact",
-      "talentId": 13001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/linnea.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2166,11 +1519,7 @@
       ]
     },
     "莫娜": {
-      "characterId": 10000041,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/mona.json",
       "talentIdentity": "exact",
-      "talentId": 4101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/mona.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2187,11 +1536,7 @@
       ]
     },
     "莱依拉": {
-      "characterId": 10000074,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/layla.json",
       "talentIdentity": "exact",
-      "talentId": 7401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/layla.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2208,11 +1553,7 @@
       ]
     },
     "莱欧斯利": {
-      "characterId": 10000086,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/wriothesley.json",
       "talentIdentity": "exact",
-      "talentId": 8601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/wriothesley.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2229,11 +1570,7 @@
       ]
     },
     "菈乌玛": {
-      "characterId": 10000119,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/lauma.json",
       "talentIdentity": "exact",
-      "talentId": 11901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/lauma.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2250,11 +1587,7 @@
       ]
     },
     "菲林斯": {
-      "characterId": 10000120,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/flins.json",
       "talentIdentity": "exact",
-      "talentId": 12001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/flins.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2271,11 +1604,7 @@
       ]
     },
     "菲米尼": {
-      "characterId": 10000085,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/freminet.json",
       "talentIdentity": "exact",
-      "talentId": 8501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/freminet.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2292,11 +1621,7 @@
       ]
     },
     "菲谢尔": {
-      "characterId": 10000031,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/fischl.json",
       "talentIdentity": "exact",
-      "talentId": 3101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/fischl.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2313,11 +1638,7 @@
       ]
     },
     "蓝砚": {
-      "characterId": 10000108,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/lanyan.json",
       "talentIdentity": "exact",
-      "talentId": 10801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/lanyan.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2334,11 +1655,7 @@
       ]
     },
     "行秋": {
-      "characterId": 10000025,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/xingqiu.json",
       "talentIdentity": "exact",
-      "talentId": 2501,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/xingqiu.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2355,11 +1672,7 @@
       ]
     },
     "诺艾尔": {
-      "characterId": 10000034,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/noelle.json",
       "talentIdentity": "exact",
-      "talentId": 3401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/noelle.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2376,11 +1689,7 @@
       ]
     },
     "赛索斯": {
-      "characterId": 10000097,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/sethos.json",
       "talentIdentity": "exact",
-      "talentId": 9701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/sethos.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2397,11 +1706,7 @@
       ]
     },
     "赛诺": {
-      "characterId": 10000071,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/cyno.json",
       "talentIdentity": "exact",
-      "talentId": 7101,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/cyno.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2418,11 +1723,7 @@
       ]
     },
     "辛焱": {
-      "characterId": 10000044,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/xinyan.json",
       "talentIdentity": "exact",
-      "talentId": 4401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/xinyan.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2439,11 +1740,7 @@
       ]
     },
     "达达利亚": {
-      "characterId": 10000033,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/tartaglia.json",
       "talentIdentity": "exact",
-      "talentId": 3301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/tartaglia.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2460,11 +1757,7 @@
       ]
     },
     "迪卢克": {
-      "characterId": 10000016,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/diluc.json",
       "talentIdentity": "exact",
-      "talentId": 1601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/diluc.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2481,11 +1774,7 @@
       ]
     },
     "迪奥娜": {
-      "characterId": 10000039,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/diona.json",
       "talentIdentity": "exact",
-      "talentId": 3901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/diona.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2502,11 +1791,7 @@
       ]
     },
     "迪希雅": {
-      "characterId": 10000079,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/dehya.json",
       "talentIdentity": "exact",
-      "talentId": 7901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/dehya.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2523,11 +1808,7 @@
       ]
     },
     "那维莱特": {
-      "characterId": 10000087,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/neuvillette.json",
       "talentIdentity": "exact",
-      "talentId": 8701,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/neuvillette.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2544,11 +1825,7 @@
       ]
     },
     "重云": {
-      "characterId": 10000036,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/chongyun.json",
       "talentIdentity": "exact",
-      "talentId": 3601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/chongyun.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2565,11 +1842,7 @@
       ]
     },
     "钟离": {
-      "characterId": 10000030,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/zhongli.json",
       "talentIdentity": "exact",
-      "talentId": 3001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/zhongli.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2586,11 +1859,7 @@
       ]
     },
     "闲云": {
-      "characterId": 10000093,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/xianyun.json",
       "talentIdentity": "exact",
-      "talentId": 9301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/xianyun.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2607,11 +1876,7 @@
       ]
     },
     "阿罗夏": {
-      "characterId": 10000148,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/alyosha.json",
       "talentIdentity": "exact",
-      "talentId": 14801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/alyosha.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2628,11 +1893,7 @@
       ]
     },
     "阿蕾奇诺": {
-      "characterId": 10000096,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/arlecchino.json",
       "talentIdentity": "exact",
-      "talentId": 9601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/arlecchino.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2649,11 +1910,7 @@
       ]
     },
     "阿贝多": {
-      "characterId": 10000038,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/albedo.json",
       "talentIdentity": "exact",
-      "talentId": 3801,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/albedo.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2670,11 +1927,7 @@
       ]
     },
     "雅珂达": {
-      "characterId": 10000124,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/jahoda.json",
       "talentIdentity": "exact",
-      "talentId": 12401,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/jahoda.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2691,11 +1944,7 @@
       ]
     },
     "雷泽": {
-      "characterId": 10000020,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/razor.json",
       "talentIdentity": "exact",
-      "talentId": 2001,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/razor.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2712,11 +1961,7 @@
       ]
     },
     "雷电将军": {
-      "characterId": 10000052,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/raidenshogun.json",
       "talentIdentity": "exact",
-      "talentId": 5201,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/raidenshogun.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2733,11 +1978,7 @@
       ]
     },
     "香菱": {
-      "characterId": 10000023,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/xiangling.json",
       "talentIdentity": "exact",
-      "talentId": 2301,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/xiangling.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2754,11 +1995,7 @@
       ]
     },
     "魈": {
-      "characterId": 10000026,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/xiao.json",
       "talentIdentity": "exact",
-      "talentId": 2601,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/xiao.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2775,11 +2012,7 @@
       ]
     },
     "鹿野院平藏": {
-      "characterId": 10000059,
-      "characterSourceFile": "src/data/ChineseSimplified/characters/shikanoinheizou.json",
       "talentIdentity": "exact",
-      "talentId": 5901,
-      "talentSourceFile": "src/data/ChineseSimplified/talents/shikanoinheizou.json",
       "combatSkills": [
         {
           "slot": "combat1",
@@ -2799,1544 +2032,1244 @@
   "weapons": {
     "「一心传」名刀": [
       {
-        "id": 11419,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prizedisshinblade.json"
+        "id": 11419
       },
       {
-        "id": 11420,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prizedisshinblade-01.json"
+        "id": 11420
       },
       {
-        "id": 11421,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prizedisshinblade-02.json"
+        "id": 11421
       }
     ],
     "「渔获」": [
       {
-        "id": 13415,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thecatch.json"
+        "id": 13415
       }
     ],
     "「究极霸王超级魔剑」": [
       {
-        "id": 12426,
-        "sourceFile": "src/data/ChineseSimplified/weapons/ultimateoverlordsmegamagicsword.json"
+        "id": 12426
       }
     ],
     "万世流涌大典": [
       {
-        "id": 14514,
-        "sourceFile": "src/data/ChineseSimplified/weapons/tomeoftheeternalflow.json"
+        "id": 14514
       }
     ],
     "万国诸海图谱": [
       {
-        "id": 14407,
-        "sourceFile": "src/data/ChineseSimplified/weapons/mappamare.json"
+        "id": 14407
       }
     ],
     "万能钥匙": [
       {
-        "id": 12433,
-        "sourceFile": "src/data/ChineseSimplified/weapons/masterkey.json"
+        "id": 12433
       }
     ],
     "不灭月华": [
       {
-        "id": 14506,
-        "sourceFile": "src/data/ChineseSimplified/weapons/everlastingmoonglow.json"
+        "id": 14506
       }
     ],
     "且住亭御咄": [
       {
-        "id": 13432,
-        "sourceFile": "src/data/ChineseSimplified/weapons/tamayurateinoohanashi.json"
+        "id": 13432
       }
     ],
     "东花坊时雨": [
       {
-        "id": 11422,
-        "sourceFile": "src/data/ChineseSimplified/weapons/toukaboushigure.json"
+        "id": 11422
       }
     ],
     "乌髓孑灯": [
       {
-        "id": 14433,
-        "sourceFile": "src/data/ChineseSimplified/weapons/blackmarrowlantern.json"
+        "id": 14433
       }
     ],
     "乘浪的回旋": [
       {
-        "id": 14430,
-        "sourceFile": "src/data/ChineseSimplified/weapons/waveridingwhirl.json"
+        "id": 14430
       }
     ],
     "以理服人": [
       {
-        "id": 12305,
-        "sourceFile": "src/data/ChineseSimplified/weapons/debateclub.json"
+        "id": 12305
       }
     ],
     "佣兵重剑": [
       {
-        "id": 12201,
-        "sourceFile": "src/data/ChineseSimplified/weapons/oldmercspal.json"
+        "id": 12201
       }
     ],
     "便携动力锯": [
       {
-        "id": 12427,
-        "sourceFile": "src/data/ChineseSimplified/weapons/portablepowersaw.json"
+        "id": 12427
       }
     ],
     "信使": [
       {
-        "id": 15305,
-        "sourceFile": "src/data/ChineseSimplified/weapons/messenger.json"
+        "id": 15305
       }
     ],
     "公义的酬报": [
       {
-        "id": 13425,
-        "sourceFile": "src/data/ChineseSimplified/weapons/rightfulreward.json"
+        "id": 13425
       }
     ],
     "冬极白星": [
       {
-        "id": 15507,
-        "sourceFile": "src/data/ChineseSimplified/weapons/polarstar.json"
+        "id": 15507
       }
     ],
     "冲浪时光": [
       {
-        "id": 14516,
-        "sourceFile": "src/data/ChineseSimplified/weapons/surfsup.json"
+        "id": 14516
       }
     ],
     "决斗之枪": [
       {
-        "id": 13405,
-        "sourceFile": "src/data/ChineseSimplified/weapons/deathmatch.json"
+        "id": 13405
       }
     ],
     "冷刃": [
       {
-        "id": 11301,
-        "sourceFile": "src/data/ChineseSimplified/weapons/coolsteel.json"
+        "id": 11301
       }
     ],
     "冷寂迸音": [
       {
-        "id": 15432,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sequenceofsolitude.json"
+        "id": 15432
       }
     ],
     "勘探钻机": [
       {
-        "id": 13427,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prospectorsdrill.json"
+        "id": 13427
       }
     ],
     "匣里日月": [
       {
-        "id": 14405,
-        "sourceFile": "src/data/ChineseSimplified/weapons/solarpearl.json"
+        "id": 14405
       }
     ],
     "匣里灭辰": [
       {
-        "id": 13401,
-        "sourceFile": "src/data/ChineseSimplified/weapons/dragonsbane.json"
+        "id": 13401
       }
     ],
     "匣里龙吟": [
       {
-        "id": 11405,
-        "sourceFile": "src/data/ChineseSimplified/weapons/lionsroar.json"
+        "id": 11405
       }
     ],
     "千夜浮梦": [
       {
-        "id": 14511,
-        "sourceFile": "src/data/ChineseSimplified/weapons/athousandfloatingdreams.json"
+        "id": 14511
       }
     ],
     "千岩古剑": [
       {
-        "id": 12410,
-        "sourceFile": "src/data/ChineseSimplified/weapons/lithicblade.json"
+        "id": 12410
       }
     ],
     "千岩长枪": [
       {
-        "id": 13406,
-        "sourceFile": "src/data/ChineseSimplified/weapons/lithicspear.json"
+        "id": 13406
       }
     ],
     "厄水之祸": [
       {
-        "id": 11432,
-        "sourceFile": "src/data/ChineseSimplified/weapons/calamityofeshu.json"
+        "id": 11432
       }
     ],
     "历练的猎弓": [
       {
-        "id": 15201,
-        "sourceFile": "src/data/ChineseSimplified/weapons/seasonedhuntersbow.json"
+        "id": 15201
       }
     ],
     "原木刀": [
       {
-        "id": 11417,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sapwoodblade.json"
+        "id": 11417
       }
     ],
     "反曲弓": [
       {
-        "id": 15303,
-        "sourceFile": "src/data/ChineseSimplified/weapons/recurvebow.json"
+        "id": 15303
       }
     ],
     "口袋魔导书": [
       {
-        "id": 14201,
-        "sourceFile": "src/data/ChineseSimplified/weapons/pocketgrimoire.json"
+        "id": 14201
       }
     ],
     "吃虎鱼刀": [
       {
-        "id": 11305,
-        "sourceFile": "src/data/ChineseSimplified/weapons/filletblade.json"
+        "id": 11305
       }
     ],
     "和璞鸢": [
       {
-        "id": 13505,
-        "sourceFile": "src/data/ChineseSimplified/weapons/primordialjadewingedspear.json"
+        "id": 13505
       }
     ],
     "喜多院十文字": [
       {
-        "id": 13414,
-        "sourceFile": "src/data/ChineseSimplified/weapons/kitaincrossspear.json"
+        "id": 13414
       }
     ],
     "嘟嘟可故事集": [
       {
-        "id": 14413,
-        "sourceFile": "src/data/ChineseSimplified/weapons/dodocotales.json"
+        "id": 14413
       }
     ],
     "四风原典": [
       {
-        "id": 14502,
-        "sourceFile": "src/data/ChineseSimplified/weapons/lostprayertothesacredwinds.json"
+        "id": 14502
       }
     ],
     "图莱杜拉的回忆": [
       {
-        "id": 14512,
-        "sourceFile": "src/data/ChineseSimplified/weapons/tulaytullahsremembrance.json"
+        "id": 14512
       }
     ],
     "圣显之钥": [
       {
-        "id": 11511,
-        "sourceFile": "src/data/ChineseSimplified/weapons/keyofkhajnisut.json"
+        "id": 11511
       }
     ],
     "圣祭者的辉杖": [
       {
-        "id": 13434,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sacrificersstaff.json"
+        "id": 13434
       }
     ],
     "天光的纺琴": [
       {
-        "id": 14432,
-        "sourceFile": "src/data/ChineseSimplified/weapons/etherlightspindlelute.json"
+        "id": 14432
       }
     ],
     "天目影打刀": [
       {
-        "id": 11414,
-        "sourceFile": "src/data/ChineseSimplified/weapons/amenomakageuchi.json"
+        "id": 11414
       }
     ],
     "天空之傲": [
       {
-        "id": 12501,
-        "sourceFile": "src/data/ChineseSimplified/weapons/skywardpride.json"
+        "id": 12501
       }
     ],
     "天空之刃": [
       {
-        "id": 11502,
-        "sourceFile": "src/data/ChineseSimplified/weapons/skywardblade.json"
+        "id": 11502
       }
     ],
     "天空之卷": [
       {
-        "id": 14501,
-        "sourceFile": "src/data/ChineseSimplified/weapons/skywardatlas.json"
+        "id": 14501
       }
     ],
     "天空之翼": [
       {
-        "id": 15501,
-        "sourceFile": "src/data/ChineseSimplified/weapons/skywardharp.json"
+        "id": 15501
       }
     ],
     "天空之脊": [
       {
-        "id": 13502,
-        "sourceFile": "src/data/ChineseSimplified/weapons/skywardspine.json"
+        "id": 13502
       }
     ],
     "学徒笔记": [
       {
-        "id": 14101,
-        "sourceFile": "src/data/ChineseSimplified/weapons/apprenticesnotes.json"
+        "id": 14101
       }
     ],
     "宗室大剑": [
       {
-        "id": 12404,
-        "sourceFile": "src/data/ChineseSimplified/weapons/royalgreatsword.json"
+        "id": 12404
       }
     ],
     "宗室猎枪": [
       {
-        "id": 13408,
-        "sourceFile": "src/data/ChineseSimplified/weapons/royalspear.json"
+        "id": 13408
       }
     ],
     "宗室秘法录": [
       {
-        "id": 14404,
-        "sourceFile": "src/data/ChineseSimplified/weapons/royalgrimoire.json"
+        "id": 14404
       }
     ],
     "宗室长剑": [
       {
-        "id": 11404,
-        "sourceFile": "src/data/ChineseSimplified/weapons/royallongsword.json"
+        "id": 11404
       }
     ],
     "宗室长弓": [
       {
-        "id": 15404,
-        "sourceFile": "src/data/ChineseSimplified/weapons/royalbow.json"
+        "id": 15404
       }
     ],
     "寒息": [
       {
-        "id": 13435,
-        "sourceFile": "src/data/ChineseSimplified/weapons/frostbreath.json"
+        "id": 13435
       }
     ],
     "寝正月初晴": [
       {
-        "id": 14518,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sunnymorningsleepin.json"
+        "id": 14518
       }
     ],
     "寸心余响": [
       {
-        "id": 14436,
-        "sourceFile": "src/data/ChineseSimplified/weapons/echoesoftheheart.json"
+        "id": 14436
       }
     ],
     "尘世之锁": [
       {
-        "id": 14504,
-        "sourceFile": "src/data/ChineseSimplified/weapons/memoryofdust.json"
+        "id": 14504
       }
     ],
     "尘光七谕": [
       {
-        "id": 14523,
-        "sourceFile": "src/data/ChineseSimplified/weapons/angelosheptades.json"
+        "id": 14523
       }
     ],
     "山王长牙": [
       {
-        "id": 12513,
-        "sourceFile": "src/data/ChineseSimplified/weapons/fangofthemountainking.json"
+        "id": 12513
       }
     ],
     "岩峰巡歌": [
       {
-        "id": 11516,
-        "sourceFile": "src/data/ChineseSimplified/weapons/peakpatrolsong.json"
+        "id": 11516
       }
     ],
     "峡湾长歌": [
       {
-        "id": 13424,
-        "sourceFile": "src/data/ChineseSimplified/weapons/balladofthefjords.json"
+        "id": 13424
       }
     ],
     "帷间夜曲": [
       {
-        "id": 14522,
-        "sourceFile": "src/data/ChineseSimplified/weapons/nocturnescurtaincall.json"
+        "id": 14522
       }
     ],
     "幽夜华尔兹": [
       {
-        "id": 15412,
-        "sourceFile": "src/data/ChineseSimplified/weapons/mitternachtswaltz.json"
+        "id": 15412
       }
     ],
     "异世界行记": [
       {
-        "id": 14303,
-        "sourceFile": "src/data/ChineseSimplified/weapons/otherworldlystory.json"
+        "id": 14303
       }
     ],
     "弓藏": [
       {
-        "id": 15405,
-        "sourceFile": "src/data/ChineseSimplified/weapons/rust.json"
+        "id": 15405
       }
     ],
     "引火之源": [
       {
-        "id": 11436,
-        "sourceFile": "src/data/ChineseSimplified/weapons/emberwell.json"
+        "id": 11436
       }
     ],
     "弥坚骨": [
       {
-        "id": 11430,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sturdybone.json"
+        "id": 11430
       }
     ],
     "弹弓": [
       {
-        "id": 15304,
-        "sourceFile": "src/data/ChineseSimplified/weapons/slingshot.json"
+        "id": 15304
       }
     ],
     "忍冬之果": [
       {
-        "id": 14412,
-        "sourceFile": "src/data/ChineseSimplified/weapons/frostbearer.json"
+        "id": 14412
       }
     ],
     "息灾": [
       {
-        "id": 13507,
-        "sourceFile": "src/data/ChineseSimplified/weapons/calamityqueller.json"
+        "id": 13507
       }
     ],
     "息燧之笛": [
       {
-        "id": 11431,
-        "sourceFile": "src/data/ChineseSimplified/weapons/fluteofezpitzal.json"
+        "id": 11431
       }
     ],
     "恶王丸": [
       {
-        "id": 12416,
-        "sourceFile": "src/data/ChineseSimplified/weapons/akuoumaru.json"
+        "id": 12416
       }
     ],
     "悬黎千钧": [
       {
-        "id": 15435,
-        "sourceFile": "src/data/ChineseSimplified/weapons/jadevista.json"
+        "id": 15435
       }
     ],
     "戍望谣歌": [
       {
-        "id": 13436,
-        "sourceFile": "src/data/ChineseSimplified/weapons/songofthevigil.json"
+        "id": 13436
       }
     ],
     "护摩之杖": [
       {
-        "id": 13501,
-        "sourceFile": "src/data/ChineseSimplified/weapons/staffofhoma.json"
+        "id": 13501
       }
     ],
     "拾慧铸熔": [
       {
-        "id": 12432,
-        "sourceFile": "src/data/ChineseSimplified/weapons/flameforgedinsight.json"
+        "id": 12432
       }
     ],
     "掘金之锹": [
       {
-        "id": 13433,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prospectorsshovel.json"
+        "id": 13433
       }
     ],
     "掠食者": [
       {
-        "id": 15415,
-        "sourceFile": "src/data/ChineseSimplified/weapons/predator.json"
+        "id": 15415
       }
     ],
     "撼地者": [
       {
-        "id": 12431,
-        "sourceFile": "src/data/ChineseSimplified/weapons/earthshaker.json"
+        "id": 12431
       }
     ],
     "支离轮光": [
       {
-        "id": 13515,
-        "sourceFile": "src/data/ChineseSimplified/weapons/fracturedhalo.json"
+        "id": 13515
       }
     ],
     "救赎之斩": [
       {
-        "id": 12436,
-        "sourceFile": "src/data/ChineseSimplified/weapons/bladeofatonement.json"
+        "id": 12436
       }
     ],
     "斫峰之刃": [
       {
-        "id": 11504,
-        "sourceFile": "src/data/ChineseSimplified/weapons/summitshaper.json"
+        "id": 11504
       }
     ],
     "断浪长鳍": [
       {
-        "id": 13416,
-        "sourceFile": "src/data/ChineseSimplified/weapons/wavebreakersfin.json"
+        "id": 13416
       }
     ],
     "新手长枪": [
       {
-        "id": 13101,
-        "sourceFile": "src/data/ChineseSimplified/weapons/beginnersprotector.json"
+        "id": 13101
       }
     ],
     "旅行剑": [
       {
-        "id": 11303,
-        "sourceFile": "src/data/ChineseSimplified/weapons/travelershandysword.json"
+        "id": 11303
       }
     ],
     "无垠蔚蓝之歌": [
       {
-        "id": 14426,
-        "sourceFile": "src/data/ChineseSimplified/weapons/balladoftheboundlessblue.json"
+        "id": 14426
       }
     ],
     "无工之剑": [
       {
-        "id": 12504,
-        "sourceFile": "src/data/ChineseSimplified/weapons/theunforged.json"
+        "id": 12504
       }
     ],
     "无锋剑": [
       {
-        "id": 11101,
-        "sourceFile": "src/data/ChineseSimplified/weapons/dullblade.json"
+        "id": 11101
       }
     ],
     "星锋剑": [
       {
-        "id": 11521,
-        "sourceFile": "src/data/ChineseSimplified/weapons/exaiphanesblade.json"
+        "id": 11521
       }
     ],
     "星鹫赤羽": [
       {
-        "id": 15514,
-        "sourceFile": "src/data/ChineseSimplified/weapons/astralvulturescrimsonplumage.json"
+        "id": 15514
       }
     ],
     "昭心": [
       {
-        "id": 14409,
-        "sourceFile": "src/data/ChineseSimplified/weapons/eyeofperception.json"
+        "id": 14409
       }
     ],
     "暗巷猎手": [
       {
-        "id": 15410,
-        "sourceFile": "src/data/ChineseSimplified/weapons/alleyhunter.json"
+        "id": 15410
       }
     ],
     "暗巷的酒与诗": [
       {
-        "id": 14410,
-        "sourceFile": "src/data/ChineseSimplified/weapons/wineandsong.json"
+        "id": 14410
       }
     ],
     "暗巷闪光": [
       {
-        "id": 11410,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thealleyflash.json"
+        "id": 11410
       }
     ],
     "暗铁剑": [
       {
-        "id": 11304,
-        "sourceFile": "src/data/ChineseSimplified/weapons/darkironsword.json"
+        "id": 11304
       }
     ],
     "曚云之月": [
       {
-        "id": 15416,
-        "sourceFile": "src/data/ChineseSimplified/weapons/mouunsmoon.json"
+        "id": 15416
       }
     ],
     "最初的大魔术": [
       {
-        "id": 15512,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thefirstgreatmagic.json"
+        "id": 15512
       }
     ],
     "有乐御簾切": [
       {
-        "id": 11514,
-        "sourceFile": "src/data/ChineseSimplified/weapons/urakumisugiri.json"
+        "id": 11514
       }
     ],
     "朏魄含光": [
       {
-        "id": 11519,
-        "sourceFile": "src/data/ChineseSimplified/weapons/lightbearingmoonshard.json"
+        "id": 11519
       }
     ],
     "木棉之环": [
       {
-        "id": 14431,
-        "sourceFile": "src/data/ChineseSimplified/weapons/ringofyaxche.json"
+        "id": 14431
       }
     ],
     "松籁响起之时": [
       {
-        "id": 12503,
-        "sourceFile": "src/data/ChineseSimplified/weapons/songofbrokenpines.json"
+        "id": 12503
       }
     ],
     "柔灯挽歌": [
       {
-        "id": 13513,
-        "sourceFile": "src/data/ChineseSimplified/weapons/lumidouceelegy.json"
+        "id": 13513
       }
     ],
     "桂木斩长正": [
       {
-        "id": 12414,
-        "sourceFile": "src/data/ChineseSimplified/weapons/katsuragikirinagamasa.json"
+        "id": 12414
       }
     ],
     "森林王器": [
       {
-        "id": 12417,
-        "sourceFile": "src/data/ChineseSimplified/weapons/forestregalia.json"
+        "id": 12417
       }
     ],
     "水仙十字之剑": [
       {
-        "id": 11428,
-        "sourceFile": "src/data/ChineseSimplified/weapons/swordofnarzissenkreuz.json"
+        "id": 11428
       }
     ],
     "沐浴龙血的剑": [
       {
-        "id": 12302,
-        "sourceFile": "src/data/ChineseSimplified/weapons/bloodtaintedgreatsword.json"
+        "id": 12302
       }
     ],
     "沙中伟贤的对答": [
       {
-        "id": 13426,
-        "sourceFile": "src/data/ChineseSimplified/weapons/dialoguesofthedesertsages.json"
+        "id": 13426
       }
     ],
     "波乱月白经津": [
       {
-        "id": 11510,
-        "sourceFile": "src/data/ChineseSimplified/weapons/harangeppakufutsu.json"
+        "id": 11510
       }
     ],
     "流月针": [
       {
-        "id": 13403,
-        "sourceFile": "src/data/ChineseSimplified/weapons/crescentpike.json"
+        "id": 13403
       }
     ],
     "流浪乐章": [
       {
-        "id": 14402,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thewidsith.json"
+        "id": 14402
       }
     ],
     "流浪的晚星": [
       {
-        "id": 14416,
-        "sourceFile": "src/data/ChineseSimplified/weapons/wanderingevenstar.json"
+        "id": 14416
       }
     ],
     "测距规": [
       {
-        "id": 15427,
-        "sourceFile": "src/data/ChineseSimplified/weapons/rangegauge.json"
+        "id": 15427
       }
     ],
     "浪影阔剑": [
       {
-        "id": 12425,
-        "sourceFile": "src/data/ChineseSimplified/weapons/tidalshadow.json"
+        "id": 12425
       }
     ],
     "海渊终曲": [
       {
-        "id": 11425,
-        "sourceFile": "src/data/ChineseSimplified/weapons/finaleofthedeep.json"
+        "id": 11425
       }
     ],
     "溢彩心念": [
       {
-        "id": 14519,
-        "sourceFile": "src/data/ChineseSimplified/weapons/vividnotions.json"
+        "id": 14519
       }
     ],
     "灰河渡手": [
       {
-        "id": 11426,
-        "sourceFile": "src/data/ChineseSimplified/weapons/fleuvecendreferryman.json"
+        "id": 11426
       }
     ],
     "灾悔": [
       {
-        "id": 13517,
-        "sourceFile": "src/data/ChineseSimplified/weapons/disasterandremorse.json"
+        "id": 13517
       }
     ],
     "烈阳之嗣": [
       {
-        "id": 15424,
-        "sourceFile": "src/data/ChineseSimplified/weapons/scionoftheblazingsun.json"
+        "id": 15424
       }
     ],
     "焚曜千阳": [
       {
-        "id": 12514,
-        "sourceFile": "src/data/ChineseSimplified/weapons/athousandblazingsuns.json"
+        "id": 12514
       }
     ],
     "熔猎异端之刃": [
       {
-        "id": 11435,
-        "sourceFile": "src/data/ChineseSimplified/weapons/hereticsmoltenblade.json"
+        "id": 11435
       }
     ],
     "狼牙": [
       {
-        "id": 11424,
-        "sourceFile": "src/data/ChineseSimplified/weapons/wolffang.json"
+        "id": 11424
       }
     ],
     "狼的末路": [
       {
-        "id": 12502,
-        "sourceFile": "src/data/ChineseSimplified/weapons/wolfsgravestone.json"
+        "id": 12502
       }
     ],
     "狼的武功歌": [
       {
-        "id": 12515,
-        "sourceFile": "src/data/ChineseSimplified/weapons/gestofthemightywolf.json"
+        "id": 12515
       }
     ],
     "猎人之径": [
       {
-        "id": 15511,
-        "sourceFile": "src/data/ChineseSimplified/weapons/hunterspath.json"
+        "id": 15511
       }
     ],
     "猎弓": [
       {
-        "id": 15101,
-        "sourceFile": "src/data/ChineseSimplified/weapons/huntersbow.json"
+        "id": 15101
       }
     ],
     "王下近侍": [
       {
-        "id": 15417,
-        "sourceFile": "src/data/ChineseSimplified/weapons/kingssquire.json"
+        "id": 15417
       }
     ],
     "玛海菈的水色": [
       {
-        "id": 12415,
-        "sourceFile": "src/data/ChineseSimplified/weapons/makhairaaquamarine.json"
+        "id": 12415
       }
     ],
     "甲级宝珏": [
       {
-        "id": 14305,
-        "sourceFile": "src/data/ChineseSimplified/weapons/twinnephrite.json"
+        "id": 14305
       }
     ],
     "白影剑": [
       {
-        "id": 12407,
-        "sourceFile": "src/data/ChineseSimplified/weapons/whiteblind.json"
+        "id": 12407
       }
     ],
     "白湖冬羽": [
       {
-        "id": 11520,
-        "sourceFile": "src/data/ChineseSimplified/weapons/whitelakefrostfeather.json"
+        "id": 11520
       }
     ],
     "白缨枪": [
       {
-        "id": 13301,
-        "sourceFile": "src/data/ChineseSimplified/weapons/whitetassel.json"
+        "id": 13301
       }
     ],
     "白辰之环": [
       {
-        "id": 14414,
-        "sourceFile": "src/data/ChineseSimplified/weapons/hakushinring.json"
+        "id": 14414
       }
     ],
     "白铁大剑": [
       {
-        "id": 12303,
-        "sourceFile": "src/data/ChineseSimplified/weapons/whiteirongreatsword.json"
+        "id": 12303
       }
     ],
     "白雨心弦": [
       {
-        "id": 15513,
-        "sourceFile": "src/data/ChineseSimplified/weapons/silvershowerheartstrings.json"
+        "id": 15513
       }
     ],
     "盈满之实": [
       {
-        "id": 14417,
-        "sourceFile": "src/data/ChineseSimplified/weapons/fruitoffulfillment.json"
+        "id": 14417
       }
     ],
     "真语秘匣": [
       {
-        "id": 14521,
-        "sourceFile": "src/data/ChineseSimplified/weapons/reliquaryoftruth.json"
+        "id": 14521
       }
     ],
     "破魔之弓": [
       {
-        "id": 15414,
-        "sourceFile": "src/data/ChineseSimplified/weapons/hamayumi.json"
+        "id": 15414
       }
     ],
     "硕果钩": [
       {
-        "id": 12430,
-        "sourceFile": "src/data/ChineseSimplified/weapons/fruitfulhook.json"
+        "id": 12430
       }
     ],
     "碎链": [
       {
-        "id": 15431,
-        "sourceFile": "src/data/ChineseSimplified/weapons/chainbreaker.json"
+        "id": 15431
       }
     ],
     "碧落之珑": [
       {
-        "id": 14505,
-        "sourceFile": "src/data/ChineseSimplified/weapons/jadefallssplendor.json"
+        "id": 14505
       }
     ],
     "磐岩结绿": [
       {
-        "id": 11505,
-        "sourceFile": "src/data/ChineseSimplified/weapons/primordialjadecutter.json"
+        "id": 11505
       }
     ],
     "神乐之真意": [
       {
-        "id": 14509,
-        "sourceFile": "src/data/ChineseSimplified/weapons/kagurasverity.json"
+        "id": 14509
       }
     ],
     "神射手之誓": [
       {
-        "id": 15302,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sharpshootersoath.json"
+        "id": 15302
       }
     ],
     "祭星者之望": [
       {
-        "id": 14517,
-        "sourceFile": "src/data/ChineseSimplified/weapons/starcallerswatch.json"
+        "id": 14517
       }
     ],
     "祭礼剑": [
       {
-        "id": 11403,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sacrificialsword.json"
+        "id": 11403
       }
     ],
     "祭礼大剑": [
       {
-        "id": 12403,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sacrificialgreatsword.json"
+        "id": 12403
       }
     ],
     "祭礼弓": [
       {
-        "id": 15403,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sacrificialbow.json"
+        "id": 15403
       }
     ],
     "祭礼残章": [
       {
-        "id": 14403,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sacrificialfragments.json"
+        "id": 14403
       }
     ],
     "竭泽": [
       {
-        "id": 15418,
-        "sourceFile": "src/data/ChineseSimplified/weapons/endoftheline.json"
+        "id": 15418
       }
     ],
     "笛剑": [
       {
-        "id": 11402,
-        "sourceFile": "src/data/ChineseSimplified/weapons/theflute.json"
+        "id": 11402
       }
     ],
     "笼钓瓶一心": [
       {
-        "id": 11416,
-        "sourceFile": "src/data/ChineseSimplified/weapons/kagotsurubeisshin.json"
+        "id": 11416
       }
     ],
     "筑云": [
       {
-        "id": 15426,
-        "sourceFile": "src/data/ChineseSimplified/weapons/cloudforged.json"
+        "id": 15426
       }
     ],
     "纯水流华": [
       {
-        "id": 14425,
-        "sourceFile": "src/data/ChineseSimplified/weapons/flowingpurity.json"
+        "id": 14425
       }
     ],
     "纺夜天镜": [
       {
-        "id": 14520,
-        "sourceFile": "src/data/ChineseSimplified/weapons/nightweaverslookingglass.json"
+        "id": 14520
       }
     ],
     "织月者的曙色": [
       {
-        "id": 11434,
-        "sourceFile": "src/data/ChineseSimplified/weapons/moonweaversdawn.json"
+        "id": 11434
       }
     ],
     "终末嗟叹之诗": [
       {
-        "id": 15503,
-        "sourceFile": "src/data/ChineseSimplified/weapons/elegyfortheend.json"
+        "id": 15503
       }
     ],
     "绝弦": [
       {
-        "id": 15402,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thestringless.json"
+        "id": 15402
       }
     ],
     "缀花之翎": [
       {
-        "id": 15430,
-        "sourceFile": "src/data/ChineseSimplified/weapons/flowerwreathedfeathers.json"
+        "id": 15430
       }
     ],
     "罗网勾针": [
       {
-        "id": 15433,
-        "sourceFile": "src/data/ChineseSimplified/weapons/snarehook.json"
+        "id": 15433
       }
     ],
     "群王局戏": [
       {
-        "id": 14435,
-        "sourceFile": "src/data/ChineseSimplified/weapons/clashofkings.json"
+        "id": 14435
       }
     ],
     "翡玉法球": [
       {
-        "id": 14304,
-        "sourceFile": "src/data/ChineseSimplified/weapons/emeraldorb.json"
+        "id": 14304
       }
     ],
     "聊聊棒": [
       {
-        "id": 12424,
-        "sourceFile": "src/data/ChineseSimplified/weapons/talkingstick.json"
+        "id": 12424
       }
     ],
     "腐殖之剑": [
       {
-        "id": 11413,
-        "sourceFile": "src/data/ChineseSimplified/weapons/festeringdesire.json"
+        "id": 11413
       }
     ],
     "船坞长剑": [
       {
-        "id": 11427,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thedockhandsassistant.json"
+        "id": 11427
       }
     ],
     "苇海信标": [
       {
-        "id": 12511,
-        "sourceFile": "src/data/ChineseSimplified/weapons/beaconofthereedsea.json"
+        "id": 12511
       }
     ],
     "苍古自由之誓": [
       {
-        "id": 11503,
-        "sourceFile": "src/data/ChineseSimplified/weapons/freedomsworn.json"
+        "id": 11503
       }
     ],
     "苍纹角杯": [
       {
-        "id": 14427,
-        "sourceFile": "src/data/ChineseSimplified/weapons/ashgravendrinkinghorn.json"
+        "id": 14427
       }
     ],
     "苍翠猎弓": [
       {
-        "id": 15409,
-        "sourceFile": "src/data/ChineseSimplified/weapons/theviridescenthunt.json"
+        "id": 15409
       }
     ],
     "苍耀": [
       {
-        "id": 11517,
-        "sourceFile": "src/data/ChineseSimplified/weapons/azurelight.json"
+        "id": 11517
       }
     ],
     "若水": [
       {
-        "id": 15508,
-        "sourceFile": "src/data/ChineseSimplified/weapons/aquasimulacra.json"
+        "id": 15508
       }
     ],
     "落霞": [
       {
-        "id": 15411,
-        "sourceFile": "src/data/ChineseSimplified/weapons/fadingtwilight.json"
+        "id": 15411
       }
     ],
     "薙草之稻光": [
       {
-        "id": 13509,
-        "sourceFile": "src/data/ChineseSimplified/weapons/engulfinglightning.json"
+        "id": 13509
       }
     ],
     "虹的行迹": [
       {
-        "id": 13431,
-        "sourceFile": "src/data/ChineseSimplified/weapons/footprintoftherainbow.json"
+        "id": 13431
       }
     ],
     "虹蛇的雨弦": [
       {
-        "id": 15434,
-        "sourceFile": "src/data/ChineseSimplified/weapons/rainbowserpentsrainbow.json"
+        "id": 15434
       }
     ],
     "螭骨剑": [
       {
-        "id": 12409,
-        "sourceFile": "src/data/ChineseSimplified/weapons/serpentspine.json"
+        "id": 12409
       }
     ],
     "血染荒城": [
       {
-        "id": 13516,
-        "sourceFile": "src/data/ChineseSimplified/weapons/bloodsoakedruins.json"
+        "id": 13516
       }
     ],
     "衔珠海皇": [
       {
-        "id": 12412,
-        "sourceFile": "src/data/ChineseSimplified/weapons/luxurioussealord.json"
+        "id": 12412
       }
     ],
     "裁叶萃光": [
       {
-        "id": 11512,
-        "sourceFile": "src/data/ChineseSimplified/weapons/lightoffoliarincision.json"
+        "id": 11512
       }
     ],
     "裁断": [
       {
-        "id": 12512,
-        "sourceFile": "src/data/ChineseSimplified/weapons/verdict.json"
+        "id": 12512
       }
     ],
     "西福斯的月光": [
       {
-        "id": 11418,
-        "sourceFile": "src/data/ChineseSimplified/weapons/xiphosmoonlight.json"
+        "id": 11418
       }
     ],
     "西风剑": [
       {
-        "id": 11401,
-        "sourceFile": "src/data/ChineseSimplified/weapons/favoniussword.json"
+        "id": 11401
       }
     ],
     "西风大剑": [
       {
-        "id": 12401,
-        "sourceFile": "src/data/ChineseSimplified/weapons/favoniusgreatsword.json"
+        "id": 12401
       }
     ],
     "西风猎弓": [
       {
-        "id": 15401,
-        "sourceFile": "src/data/ChineseSimplified/weapons/favoniuswarbow.json"
+        "id": 15401
       }
     ],
     "西风秘典": [
       {
-        "id": 14401,
-        "sourceFile": "src/data/ChineseSimplified/weapons/favoniuscodex.json"
+        "id": 14401
       }
     ],
     "西风长枪": [
       {
-        "id": 13407,
-        "sourceFile": "src/data/ChineseSimplified/weapons/favoniuslance.json"
+        "id": 13407
       }
     ],
     "讨龙英杰谭": [
       {
-        "id": 14302,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thrillingtalesofdragonslayers.json"
+        "id": 14302
       }
     ],
     "训练大剑": [
       {
-        "id": 12101,
-        "sourceFile": "src/data/ChineseSimplified/weapons/wastergreatsword.json"
+        "id": 12101
       }
     ],
     "证誓之明瞳": [
       {
-        "id": 14415,
-        "sourceFile": "src/data/ChineseSimplified/weapons/oathsworneye.json"
+        "id": 14415
       }
     ],
     "试作古华": [
       {
-        "id": 12406,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prototypearchaic.json"
+        "id": 12406
       }
     ],
     "试作斩岩": [
       {
-        "id": 11406,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prototyperancour.json"
+        "id": 11406
       }
     ],
     "试作星镰": [
       {
-        "id": 13402,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prototypestarglitter.json"
+        "id": 13402
       }
     ],
     "试作澹月": [
       {
-        "id": 15406,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prototypecrescent.json"
+        "id": 15406
       }
     ],
     "试作金珀": [
       {
-        "id": 14406,
-        "sourceFile": "src/data/ChineseSimplified/weapons/prototypeamber.json"
+        "id": 14406
       }
     ],
     "谧音吹哨": [
       {
-        "id": 11433,
-        "sourceFile": "src/data/ChineseSimplified/weapons/serenityscall.json"
+        "id": 11433
       }
     ],
     "贯月矢": [
       {
-        "id": 13417,
-        "sourceFile": "src/data/ChineseSimplified/weapons/moonpiercer.json"
+        "id": 13417
       }
     ],
     "贯虹之槊": [
       {
-        "id": 13504,
-        "sourceFile": "src/data/ChineseSimplified/weapons/vortexvanquisher.json"
+        "id": 13504
       }
     ],
     "赤月之形": [
       {
-        "id": 13512,
-        "sourceFile": "src/data/ChineseSimplified/weapons/crimsonmoonssemblance.json"
+        "id": 13512
       }
     ],
     "赤沙之杖": [
       {
-        "id": 13511,
-        "sourceFile": "src/data/ChineseSimplified/weapons/staffofthescarletsands.json"
+        "id": 13511
       }
     ],
     "赤角石溃杵": [
       {
-        "id": 12510,
-        "sourceFile": "src/data/ChineseSimplified/weapons/redhornstonethresher.json"
+        "id": 12510
       }
     ],
     "赦罪": [
       {
-        "id": 11515,
-        "sourceFile": "src/data/ChineseSimplified/weapons/absolution.json"
+        "id": 11515
       }
     ],
     "超越之匙": [
       {
-        "id": 12516,
-        "sourceFile": "src/data/ChineseSimplified/weapons/ateaspoonoftranscendence.json"
+        "id": 12516
       }
     ],
     "辰砂之纺锤": [
       {
-        "id": 11415,
-        "sourceFile": "src/data/ChineseSimplified/weapons/cinnabarspindle.json"
+        "id": 11415
       }
     ],
     "遗祀玉珑": [
       {
-        "id": 14424,
-        "sourceFile": "src/data/ChineseSimplified/weapons/sacrificialjade.json"
+        "id": 14424
       }
     ],
     "金律铸影": [
       {
-        "id": 12435,
-        "sourceFile": "src/data/ChineseSimplified/weapons/forgedbythegoldenmelody.json"
+        "id": 12435
       }
     ],
     "金流监督": [
       {
-        "id": 14513,
-        "sourceFile": "src/data/ChineseSimplified/weapons/cashflowsupervision.json"
+        "id": 14513
       }
     ],
     "钟剑": [
       {
-        "id": 12402,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thebell.json"
+        "id": 12402
       }
     ],
     "钢轮弓": [
       {
-        "id": 15407,
-        "sourceFile": "src/data/ChineseSimplified/weapons/compoundbow.json"
+        "id": 15407
       }
     ],
     "钺矛": [
       {
-        "id": 13302,
-        "sourceFile": "src/data/ChineseSimplified/weapons/halberd.json"
+        "id": 13302
       }
     ],
     "铁尖枪": [
       {
-        "id": 13201,
-        "sourceFile": "src/data/ChineseSimplified/weapons/ironpoint.json"
+        "id": 13201
       }
     ],
     "铁影阔剑": [
       {
-        "id": 12301,
-        "sourceFile": "src/data/ChineseSimplified/weapons/ferrousshadow.json"
+        "id": 12301
       }
     ],
     "铁蜂刺": [
       {
-        "id": 11407,
-        "sourceFile": "src/data/ChineseSimplified/weapons/ironsting.json"
+        "id": 11407
       }
     ],
     "银剑": [
       {
-        "id": 11201,
-        "sourceFile": "src/data/ChineseSimplified/weapons/silversword.json"
+        "id": 11201
       }
     ],
     "镇山之钉": [
       {
-        "id": 13430,
-        "sourceFile": "src/data/ChineseSimplified/weapons/mountainbracingbolt.json"
+        "id": 13430
       }
     ],
     "阿莫斯之弓": [
       {
-        "id": 15502,
-        "sourceFile": "src/data/ChineseSimplified/weapons/amosbow.json"
+        "id": 15502
       }
     ],
     "降临之剑": [
       {
-        "id": 11412,
-        "sourceFile": "src/data/ChineseSimplified/weapons/swordofdescension.json"
+        "id": 11412
       }
     ],
     "雨裁": [
       {
-        "id": 12405,
-        "sourceFile": "src/data/ChineseSimplified/weapons/rainslasher.json"
+        "id": 12405
       }
     ],
     "雪葬的星银": [
       {
-        "id": 12411,
-        "sourceFile": "src/data/ChineseSimplified/weapons/snowtombedstarsilver.json"
+        "id": 12411
       }
     ],
     "雾切之回光": [
       {
-        "id": 11509,
-        "sourceFile": "src/data/ChineseSimplified/weapons/mistsplitterreforged.json"
+        "id": 11509
       }
     ],
     "霜结的誓金枝": [
       {
-        "id": 15516,
-        "sourceFile": "src/data/ChineseSimplified/weapons/goldenfrostboundoath.json"
+        "id": 15516
       }
     ],
     "霜辰": [
       {
-        "id": 14434,
-        "sourceFile": "src/data/ChineseSimplified/weapons/dawningfrost.json"
+        "id": 14434
       }
     ],
     "霜雪誓约": [
       {
-        "id": 15436,
-        "sourceFile": "src/data/ChineseSimplified/weapons/covenantoffrostandsnow.json"
+        "id": 15436
       }
     ],
     "静水流涌之辉": [
       {
-        "id": 11513,
-        "sourceFile": "src/data/ChineseSimplified/weapons/splendoroftranquilwaters.json"
+        "id": 11513
       }
     ],
     "静谧之曲": [
       {
-        "id": 15425,
-        "sourceFile": "src/data/ChineseSimplified/weapons/songofstillness.json"
+        "id": 15425
       }
     ],
     "风信之锋": [
       {
-        "id": 13419,
-        "sourceFile": "src/data/ChineseSimplified/weapons/missivewindspear.json"
+        "id": 13419
       }
     ],
     "风花之颂": [
       {
-        "id": 15413,
-        "sourceFile": "src/data/ChineseSimplified/weapons/windblumeode.json"
+        "id": 15413
       }
     ],
     "风鹰剑": [
       {
-        "id": 11501,
-        "sourceFile": "src/data/ChineseSimplified/weapons/aquilafavonia.json"
+        "id": 11501
       }
     ],
     "飞天大御剑": [
       {
-        "id": 12306,
-        "sourceFile": "src/data/ChineseSimplified/weapons/skyridergreatsword.json"
+        "id": 12306
       }
     ],
     "飞天御剑": [
       {
-        "id": 11306,
-        "sourceFile": "src/data/ChineseSimplified/weapons/skyridersword.json"
+        "id": 11306
       }
     ],
     "飞雷之弦振": [
       {
-        "id": 15509,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thunderingpulse.json"
+        "id": 15509
       }
     ],
     "饰铁之花": [
       {
-        "id": 12418,
-        "sourceFile": "src/data/ChineseSimplified/weapons/mailedflower.json"
+        "id": 12418
       }
     ],
     "香韵奏者": [
       {
-        "id": 13514,
-        "sourceFile": "src/data/ChineseSimplified/weapons/symphonistofscents.json"
+        "id": 13514
       }
     ],
     "魔导绪论": [
       {
-        "id": 14301,
-        "sourceFile": "src/data/ChineseSimplified/weapons/magicguide.json"
+        "id": 14301
       }
     ],
     "鸦羽弓": [
       {
-        "id": 15301,
-        "sourceFile": "src/data/ChineseSimplified/weapons/ravenbow.json"
+        "id": 15301
       }
     ],
     "鹤鸣余音": [
       {
-        "id": 14515,
-        "sourceFile": "src/data/ChineseSimplified/weapons/cranesechoingcall.json"
+        "id": 14515
       }
     ],
     "鹮穿之喙": [
       {
-        "id": 15419,
-        "sourceFile": "src/data/ChineseSimplified/weapons/ibispiercer.json"
+        "id": 15419
       }
     ],
     "黎明破晓之史": [
       {
-        "id": 15515,
-        "sourceFile": "src/data/ChineseSimplified/weapons/thedaybreakchronicles.json"
+        "id": 15515
       }
     ],
     "黎明神剑": [
       {
-        "id": 11302,
-        "sourceFile": "src/data/ChineseSimplified/weapons/harbingerofdawn.json"
+        "id": 11302
       }
     ],
     "黑剑": [
       {
-        "id": 11409,
-        "sourceFile": "src/data/ChineseSimplified/weapons/theblacksword.json"
+        "id": 11409
       }
     ],
     "黑岩刺枪": [
       {
-        "id": 13404,
-        "sourceFile": "src/data/ChineseSimplified/weapons/blackcliffpole.json"
+        "id": 13404
       }
     ],
     "黑岩战弓": [
       {
-        "id": 15408,
-        "sourceFile": "src/data/ChineseSimplified/weapons/blackcliffwarbow.json"
+        "id": 15408
       }
     ],
     "黑岩斩刀": [
       {
-        "id": 12408,
-        "sourceFile": "src/data/ChineseSimplified/weapons/blackcliffslasher.json"
+        "id": 12408
       }
     ],
     "黑岩绯玉": [
       {
-        "id": 14408,
-        "sourceFile": "src/data/ChineseSimplified/weapons/blackcliffagate.json"
+        "id": 14408
       }
     ],
     "黑岩长剑": [
       {
-        "id": 11408,
-        "sourceFile": "src/data/ChineseSimplified/weapons/blackclifflongsword.json"
+        "id": 11408
       }
     ],
     "黑缨枪": [
       {
-        "id": 13303,
-        "sourceFile": "src/data/ChineseSimplified/weapons/blacktassel.json"
+        "id": 13303
       }
     ],
     "黑蚀": [
       {
-        "id": 11518,
-        "sourceFile": "src/data/ChineseSimplified/weapons/athameartis.json"
+        "id": 11518
       }
     ],
     "龙脊长枪": [
       {
-        "id": 13409,
-        "sourceFile": "src/data/ChineseSimplified/weapons/dragonspinespear.json"
+        "id": 13409
       }
     ]
-  },
-  "observedGuideSamples": {
-    "安柏": {
-      "evidenceFile": "evidence/cross-fifth-preview.json",
-      "combatSkillNames": [
-        "神射手",
-        "箭雨",
-        "爆弹玩偶"
-      ],
-      "weaponName": "鸦羽弓"
-    },
-    "八重神子": {
-      "evidenceFile": "evidence/cross-fifth-preview.json",
-      "combatSkillNames": [
-        "大密法·天狐显真",
-        "狐灵食罪式"
-      ],
-      "weaponName": "流浪乐章"
-    },
-    "梦见月瑞希": {
-      "evidenceFile": "evidence/cross-fifth-preview.json",
-      "combatSkillNames": [
-        "安乐秘汤疗法",
-        "梦我梦心"
-      ],
-      "weaponName": "霜辰"
-    },
-    "哥伦比娅": {
-      "evidenceFile": "evidence/cross-fourth-preview.json",
-      "combatSkillNames": [
-        "月露泼降"
-      ],
-      "weaponName": "帷间夜曲"
-    },
-    "阿罗夏": {
-      "evidenceFile": "evidence/user-preview-20260915114511718-506041-preview.json",
-      "combatSkillNames": [
-        "伏袭霆击",
-        "守猎进踞",
-        "角枪驰弋"
-      ],
-      "weaponName": "寒息"
-    },
-    "那维莱特": {
-      "evidenceFile": "evidence/cross-seventh-preview.json",
-      "combatSkillNames": [
-        "潮水啊，我已归来",
-        "泪水啊，我必偿还"
-      ],
-      "weaponName": "万世流涌大典"
-    }
   }
 }
