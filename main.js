@@ -16,7 +16,15 @@ import { buildCompletionEstimate } from './core/estimate.js';
 import { applyFinalRouteInventoryGains, buildRouteExecutionPlan, runSubscribedRouteFile } from './core/route-executor.js';
 import { appendArtifactFallbackTask } from './core/artifact-executor.js';
 import { switchPartyWithRecovery } from './core/party-switch.js';
-import { assertExecutionConfirmed, normalizeScriptSettings, validateBossOverrideNames } from './core/settings.js';
+import {
+  assertExecutionConfirmed,
+  isTrainingGuideMode,
+  isTrainingGuidePreviewMode,
+  normalizeScriptSettings,
+  validateBossOverrideNames,
+} from './core/settings.js';
+import { readTrainingGuideSnapshot } from './guide-reader/index.js';
+import { buildGuideTargetData } from './core/guide-targets.js';
 import {
   createExecutionOutcome,
   createRunExecution,
@@ -37,17 +45,19 @@ const failureNotificationState = { settings: null, stage: '初始化' };
 
 async function main() {
   let scriptSettings;
+  let guidePreviewOnly = false;
   try {
     scriptSettings = normalizeScriptSettings(settings);
     scriptSettings.resinPolicyV2 = compileResinPolicyV2(scriptSettings);
-    assertExecutionConfirmed(scriptSettings);
+    guidePreviewOnly = isTrainingGuidePreviewMode(scriptSettings);
+    if (!guidePreviewOnly) assertExecutionConfirmed(scriptSettings);
   } catch (error) {
     log.error('[配置] {message}', error?.message ?? String(error));
     throw withExecutionContext(error, { code: 'config_invalid', stage: 'preflight' });
   }
   const executionEnabled = true;
-  failureNotificationState.settings = scriptSettings;
-  log.info('[模式] 已确认配置，进入实际执行模式');
+  failureNotificationState.settings = guidePreviewOnly ? null : scriptSettings;
+  log.info('[模式] {mode}', guidePreviewOnly ? '提升指南仅预览，不执行刷取任务' : '已确认配置，进入实际执行模式');
 
   failureNotificationState.stage = '读取培养目标';
   const materials = JSON.parse(file.readTextSync('data/materials.json'));
@@ -63,7 +73,25 @@ async function main() {
   validateBossOverrideNames(scriptSettings, bossCatalog);
   let targetData;
   let profileRecord = null;
-  if (isAutomaticProfileMode(scriptSettings)) {
+  let guideRecord = null;
+  if (isTrainingGuideMode(scriptSettings)) {
+    try {
+      const snapshot = await readTrainingGuideSnapshot();
+      const identities = JSON.parse(file.readTextSync('guide-reader/data/guide-identities.json'));
+      const service = typeof characterDevelopmentTask === 'undefined' ? null : characterDevelopmentTask;
+      targetData = await buildGuideTargetData({ snapshot, identities, rulebook, service });
+      guideRecord = targetData.guide;
+      await file.writeText('record/latest-guide.json', JSON.stringify(targetData, null, 2), false);
+      for (const line of targetData.targetSummary) log.info('[提升指南] {summary}', line);
+      if (guidePreviewOnly) {
+        log.info('[提升指南] 仅预览模式已完成；目标已保存到 record/latest-guide.json，未读取背包、未执行刷取任务、未发送通知');
+        return;
+      }
+    } catch (error) {
+      log.error('[提升指南] {message}', error?.message ?? String(error));
+      throw withExecutionContext(error, { code: 'guide_invalid', stage: 'profile' });
+    }
+  } else if (isAutomaticProfileMode(scriptSettings)) {
     try {
       const request = prepareAutomaticProfileRequest(scriptSettings, rulebook);
       const service = typeof characterDevelopmentTask === 'undefined' ? null : characterDevelopmentTask;
@@ -119,7 +147,8 @@ async function main() {
   } else {
     targetData = loadTargets(scriptSettings, rulebook);
   }
-  const targetSummary = profileRecord?.targetSummary ?? buildTargetSummary(targetData.targets ?? []);
+  const targetSummary = targetData.targetSummary ?? profileRecord?.targetSummary ?? buildTargetSummary(targetData.targets ?? []);
+  const targetOutcomes = targetData.targetOutcomes ?? profileRecord?.targetOutcomes ?? [];
   const sourceCandidates = JSON.parse(file.readTextSync('data/source-candidates.json'));
   const routeOverrides = JSON.parse(file.readTextSync('data/route-overrides.json'));
   const today = resolvePlanningWeekday({
@@ -153,7 +182,7 @@ async function main() {
     rulebook,
     today,
   });
-  attachTargetContext(plan, profileRecord, targetSummary);
+  attachTargetContext(plan, profileRecord, targetSummary, guideRecord, targetOutcomes);
 
   // 兼容 BetterGI 已保存的旧设置：字段不存在时也默认开启读取。
   if (!allTargetsSatisfied && scriptSettings.scanInventory !== false) {
@@ -208,7 +237,7 @@ async function main() {
       rulebook,
       today,
     });
-    attachTargetContext(plan, profileRecord, targetSummary);
+    attachTargetContext(plan, profileRecord, targetSummary, guideRecord, targetOutcomes);
     plan.inventoryUncertainties = historicalInventoryConflicts;
   } else if (!allTargetsSatisfied) {
     log.info('[背包] 已关闭自动读取，库存仅使用目标文件中的 inventory 字段');
@@ -464,7 +493,7 @@ async function main() {
         rulebook,
         today,
       });
-      attachTargetContext(plan, profileRecord, targetSummary);
+      attachTargetContext(plan, profileRecord, targetSummary, guideRecord, targetOutcomes);
       plan.routes = discoveredRoutes;
       applyMatchedRouteSupport(plan, discoveredRoutes);
       plan.weeklyStrategy = buildWeeklyStrategy(plan.weeklyPlan, today);
@@ -582,10 +611,11 @@ function loadTargets(scriptSettings, rulebook) {
   return JSON.parse(file.readTextSync(targetFile));
 }
 
-function attachTargetContext(plan, profile, targetSummary) {
+function attachTargetContext(plan, profile, targetSummary, guide = null, targetOutcomes = null) {
   plan.profile = profile;
   plan.targetSummary = targetSummary;
-  plan.targetOutcomes = profile?.targetOutcomes ?? [];
+  plan.targetOutcomes = targetOutcomes ?? profile?.targetOutcomes ?? [];
+  if (guide) plan.guide = guide;
 }
 
 async function executeResinQueue(entries, settings, partySwitchState, emptyReason = null) {

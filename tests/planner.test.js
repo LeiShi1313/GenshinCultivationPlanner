@@ -256,7 +256,9 @@ test('紧凑设置不存在时保留旧配置兼容行为', () => {
     artifactDomainEnabled: true,
     artifactDomainName: '月童的库藏',
   };
-  assert.deepEqual(normalizeScriptSettings(legacy), legacy);
+  assert.deepEqual(normalizeScriptSettings(legacy), {
+    ...legacy, targetInputMode: '提升指南识别后执行', targetsText: '',
+  });
   const legacyRoutes = normalizeScriptSettings({ routeExecutionEnabled: true });
   assert.equal(legacyRoutes.gatheringRouteExecutionEnabled, true);
   assert.equal(legacyRoutes.monsterRouteExecutionEnabled, true);
@@ -387,7 +389,7 @@ test('精简设置页的级联默认值有效且不再暴露旧开关', () => {
   assert.equal(items.find((item) => item.name === 'executionConfirmed').default, false);
   assert.equal(names.indexOf('executionConfirmed'), 1);
   assert.equal(names.indexOf('targetInputMode'), 2);
-  assert.equal(items.find((item) => item.name === 'targetInputMode').default, '读取档案并执行');
+  assert.equal(items.find((item) => item.name === 'targetInputMode').default, '读取提升指南并执行');
   assert.deepEqual(items.find((item) => item.name === 'autoWeaponMode').options, [
     '培养角色和当前佩戴武器',
     '培养角色和指定武器',

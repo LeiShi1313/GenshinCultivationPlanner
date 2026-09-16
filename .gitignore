@@ -1,3 +1,7 @@
 node_modules/
 record/*.json
 !record/.gitkeep
+collection.json
+preview.json
+collection-failure.png
+raw/

@@ -1,6 +1,10 @@
 const ARTIFACT_TEST_PREFIX = '单次｜';
 const ARTIFACT_FORMAL_PREFIX = '正式｜';
 const TARGET_INPUT_MODE_ALIASES = Object.freeze({
+  '提升指南预览（不执行）': '提升指南仅预览',
+  '读取提升指南并执行': '提升指南识别后执行',
+  '提升指南仅预览': '提升指南仅预览',
+  '提升指南识别后执行': '提升指南识别后执行',
   '预览目标（不执行）': '自动档案仅预览',
   '读取档案并执行': '自动档案识别后执行',
   '自动档案仅预览': '自动档案仅预览',
@@ -8,6 +12,7 @@ const TARGET_INPUT_MODE_ALIASES = Object.freeze({
   // 旧版公开过手动模式；升级后自动迁移到正式的档案读取流程。
   '手动填写当前与目标': '自动档案识别后执行',
 });
+const TRAINING_GUIDE_MODES = new Set(['提升指南仅预览', '提升指南识别后执行']);
 const BOSS_OVERRIDE_SLOT_COUNT = 3;
 const BOSS_OVERRIDE_ACTIONS = new Set(['继承通用配置', '启用', '禁用']);
 
@@ -24,6 +29,14 @@ export function normalizeScriptSettings(rawSettings = {}) {
   applyBossOverrides(normalized, rawSettings);
 
   return normalized;
+}
+
+export function isTrainingGuideMode(settings = {}) {
+  return TRAINING_GUIDE_MODES.has(settings.targetInputMode);
+}
+
+export function isTrainingGuidePreviewMode(settings = {}) {
+  return settings.targetInputMode === '提升指南仅预览';
 }
 
 /** 优先读取紧凑文本；旧版三组结构化配置仅用于兼容已保存的设置。 */
@@ -146,7 +159,7 @@ export function validateBossOverrideNames(settings = {}, catalog = {}) {
   }
 }
 
-/** 发布版只支持实际执行；未显式确认时必须在任何读写或游戏操作前终止。 */
+/** 实际执行模式必须先显式确认；提升指南只读预览由入口在调用前单独放行。 */
 export function assertExecutionConfirmed(settings = {}) {
   const value = settings.executionConfirmed;
   const confirmed = value === true || value === 1 || value === 'true' || value === '1';
@@ -173,7 +186,7 @@ function applyRouteModes(settings, rawSettings) {
     || settings.monsterRouteExecutionEnabled;
 }
 
-/** 公开设置只保留自动档案；旧版手动模式会迁移到正式档案读取。 */
+/** 提升指南为默认来源；旧版手动模式仍迁移到正式档案读取。 */
 function applyTargetSelections(settings, rawSettings) {
   const targetFields = [
     'customTargetsEnabled', 'targetsText', 'selectedCharacter', 'selectedWeapon', 'weaponLevelRange',
@@ -181,7 +194,11 @@ function applyTargetSelections(settings, rawSettings) {
     'autoElementalSkillTargetLevel', 'autoElementalBurstTargetLevel',
     'autoWeaponMode', 'autoWeaponTargetLevel',
   ];
-  if (!targetFields.some((field) => rawSettings[field] !== undefined)) return;
+  if (!targetFields.some((field) => rawSettings[field] !== undefined)) {
+    settings.targetInputMode = '提升指南识别后执行';
+    settings.targetsText = '';
+    return;
+  }
 
   const modeLabel = String(rawSettings.targetInputMode ?? '读取档案并执行').trim();
   const targetInputMode = TARGET_INPUT_MODE_ALIASES[modeLabel];
