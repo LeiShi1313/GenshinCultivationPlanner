@@ -773,12 +773,11 @@ function validateGuideFrameCoverage(snapshot, tab) {
   const referenceBoundary = boundaries.length === 1 ? boundaries[0] : null;
   const beforeReferenceBoundary = item => !referenceBoundary ||
     centerY(item) < centerY(referenceBoundary);
-  const arrows = splitAtEdges(coverage.cardRows || [], centerY);
+  const allArrows = coverage.cardRows || [];
   const pins = splitAtEdges((coverage.sourceRows || []).filter(beforeReferenceBoundary), centerY);
-  const markers = splitAtEdges(snapshot.regions.filter(region =>
+  const allMarkers = snapshot.regions.filter(region =>
     region.x > 1500 * sx && (region.text === "升级至" ||
-      /^需要角色突破到\s*\d+\s*阶$/.test(region.text))),
-    marker => centerY(marker) + 33 * sy);
+      /^需要角色突破到\s*\d+\s*阶$/.test(region.text)));
   const sources = splitAtEdges(snapshot.regions.filter(region =>
     region.x >= 780 * sx && region.x < 1500 * sx && region.y > 330 * sy &&
     isGuideMaterialSource(region.text, tab))
@@ -810,9 +809,39 @@ function validateGuideFrameCoverage(snapshot, tab) {
     return { pairs, unmatchedLeft, unmatchedRight: unused };
   }
 
-  const cardPairs = tab === "角色天赋" ? pair(markers.complete, arrows.complete,
-    marker => centerY(marker) + 33 * sy, 22 * sy) :
-    { pairs: [], unmatchedLeft: [], unmatchedRight: [] };
+  let arrows = splitAtEdges(allArrows, centerY);
+  let markers = splitAtEdges(allMarkers, marker => centerY(marker) + 33 * sy);
+  let cardPairs = { pairs: [], unmatchedLeft: [], unmatchedRight: [] };
+  if (tab === "角色天赋") {
+    const paired = pair(allMarkers, allArrows,
+      marker => centerY(marker) + 33 * sy, 22 * sy);
+    const topPairs = paired.pairs.filter(item =>
+      centerY(item.right) < topEdgeY ||
+      centerY(item.left) + 33 * sy < topEdgeY);
+    const bottomPairs = paired.pairs.filter(item =>
+      !topPairs.includes(item) && (centerY(item.right) >= bottomEdgeY ||
+        centerY(item.left) + 33 * sy >= bottomEdgeY));
+    const completePairs = paired.pairs.filter(item =>
+      !topPairs.includes(item) && !bottomPairs.includes(item));
+    const unmatchedArrows = splitAtEdges(paired.unmatchedRight, centerY);
+    const unmatchedMarkers = splitAtEdges(paired.unmatchedLeft,
+      marker => centerY(marker) + 33 * sy);
+    arrows = {
+      top: topPairs.map(item => item.right).concat(unmatchedArrows.top),
+      complete: completePairs.map(item => item.right).concat(unmatchedArrows.complete),
+      bottom: bottomPairs.map(item => item.right).concat(unmatchedArrows.bottom)
+    };
+    markers = {
+      top: topPairs.map(item => item.left).concat(unmatchedMarkers.top),
+      complete: completePairs.map(item => item.left).concat(unmatchedMarkers.complete),
+      bottom: bottomPairs.map(item => item.left).concat(unmatchedMarkers.bottom)
+    };
+    cardPairs = {
+      pairs: completePairs,
+      unmatchedLeft: unmatchedMarkers.complete,
+      unmatchedRight: unmatchedArrows.complete
+    };
+  }
   const sourcePairs = pair(sources.complete, pins.complete,
     source => centerY(source) + 15 * sy, 20 * sy);
   const issues = [];
@@ -1502,8 +1531,16 @@ export async function readTrainingGuideSnapshot() {
         preview.run_id !== collection.run_id ||
         preview.evidence_started_at !== collection.started_at ||
         preview.captured_at !== collection.completed_at) {
-      throw new Error("提升指南读取不完整：" +
-        (preview && preview.issues || [preview && preview.error || "unknown guide error"]).join("；"));
+      const previewIssues = preview && Array.isArray(preview.issues) ?
+        preview.issues.filter(Boolean) : [];
+      const incompletePages = collection && Array.isArray(collection.characters) ?
+        collection.characters.flatMap(character => Object.entries(character.pages || {})
+          .filter(entry => entry[1] && entry[1].incomplete === true)
+          .map(entry => String(character.name || "未知角色") + entry[0] + "读取不完整")) : [];
+      const details = previewIssues.length ? previewIssues :
+        (incompletePages.length ? incompletePages :
+          [preview && preview.error || "unknown guide error"]);
+      throw new Error("提升指南读取不完整：" + details.join("；"));
     }
     return { collection, preview };
   } catch (error) {
