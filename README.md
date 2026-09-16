@@ -131,6 +131,22 @@
 - 背包和任务奖励都无法确认收益时，摘要会标记“未确认”，不会把任务调用误写成成功领奖。
 - 脚本不申请 HTTP 权限，运行时不依赖 npm 或网络服务。
 
+## 更新开发期数据
+
+更新 `genshin-db` 的精确版本和锁文件后，沿用 `tools/` 中的生成工具：
+
+```bash
+pnpm install --frozen-lockfile
+node tools/build-rulebook.mjs
+pnpm run build:guide-identities
+```
+
+`build-rulebook.mjs` 生成培养成本、材料、合成配方和来源候选，并调用 `update-target-selectors.mjs` 同步角色／武器下拉选项。
+
+`build-guide-identities.mjs` 生成提升指南读取所用的 `guide-reader/data/guide-identities.json`，只包含角色技能名称与槽位、武器身份及数据版本。同名武器保留全部候选，旅行者元素歧义保留为未确定；数据校验失败时不会覆盖已有文件。
+
+新材料有来源数据不代表已支持自动执行。新增秘境映射需核对 BetterGI 原生目录；未支持的 Boss 保持手动获取，采集仍依赖已订阅路线。这些生成工具仅供开发使用，BetterGI 运行时不需要 Node.js。
+
 ## 兼容性与源码
 
 - 最低 BetterGI 版本：`0.64.0`

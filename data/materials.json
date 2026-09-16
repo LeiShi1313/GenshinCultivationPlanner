@@ -347,6 +347,18 @@
     "executionType": "none",
     "reason": "尚未配置已验证的执行适配"
   },
+  "101275": {
+    "name": "霜仙花",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "101276": {
+    "name": "植绒草",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
   "104111": {
     "name": "燃愿玛瑙碎屑",
     "status": "excluded",
@@ -1466,6 +1478,42 @@
     "priority": 100,
     "reason": "BetterGI 内置 tp.json 奖励表对照；待实机回归"
   },
+  "104365": {
+    "name": "「慈爱」的教导",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "104366": {
+    "name": "「慈爱」的指引",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "104367": {
+    "name": "「慈爱」的哲学",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "104368": {
+    "name": "「坚忍」的教导",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "104369": {
+    "name": "「坚忍」的指引",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "104370": {
+    "name": "「坚忍」的哲学",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
   "112002": {
     "name": "史莱姆凝液",
     "status": "manual",
@@ -2326,6 +2374,78 @@
   },
   "112145": {
     "name": "无秽的月铁",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112146": {
+    "name": "幻造萤屑",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112147": {
+    "name": "幻造裂晶",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112148": {
+    "name": "幻造晶鳞石",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112149": {
+    "name": "嵌合种",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112150": {
+    "name": "并生嵌合胞",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112151": {
+    "name": "源生嵌合体",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112152": {
+    "name": "沉积残片",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112153": {
+    "name": "沉积结块",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112154": {
+    "name": "沉积增生物",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112155": {
+    "name": "灵生空根",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112156": {
+    "name": "灵生分蘖节",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "112157": {
+    "name": "灵生盘枝心",
     "status": "manual",
     "executionType": "none",
     "reason": "尚未配置已验证的执行适配"
@@ -3752,6 +3872,36 @@
     "priority": 200,
     "reason": "BetterGI 内置征讨领域奖励表对照；待实机回归"
   },
+  "113088": {
+    "name": "扭曲的枯枝",
+    "status": "supported",
+    "executionType": "weeklyBoss",
+    "domainName": "万有涅槃缚境",
+    "openDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "limited": false,
+    "priority": 200,
+    "reason": "BetterGI 内置征讨领域奖励表对照；待实机回归"
+  },
+  "113090": {
+    "name": "焰中不灭花枝",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "113091": {
+    "name": "游空之物的断尾",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
   "114001": {
     "name": "高塔孤王的破瓦",
     "status": "supported",
@@ -5011,5 +5161,77 @@
     "limited": true,
     "priority": 100,
     "reason": "BetterGI 内置 tp.json 奖励表对照；待实机回归"
+  },
+  "114085": {
+    "name": "苍星军势的始动",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114086": {
+    "name": "苍星军势的集结",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114087": {
+    "name": "苍星军势的鸣令",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114088": {
+    "name": "苍星军势的征服",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114089": {
+    "name": "藏窖灵浆的斟酌",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114090": {
+    "name": "藏窖灵浆的酩酊",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114091": {
+    "name": "藏窖灵浆的酣畅",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114092": {
+    "name": "藏窖灵浆的恣意",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114093": {
+    "name": "凛雪帝皇的复生",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114094": {
+    "name": "凛雪帝皇的庆仪",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114095": {
+    "name": "凛雪帝皇的悲恤",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
+  },
+  "114096": {
+    "name": "凛雪帝皇的辞决",
+    "status": "manual",
+    "executionType": "none",
+    "reason": "尚未配置已验证的执行适配"
   }
 }
