@@ -15,6 +15,7 @@ const NO_CHARACTER_SELECTION = '不选择角色';
 const NO_WEAPON_SELECTION = '不选择武器';
 const NO_TALENT_TARGET = '不培养';
 const LEVEL_LIMITS = new Set([20, 40, 50, 60, 70, 80, 90]);
+const COMPLETED_CHARACTER_LEVEL_LIMITS = new Set([90, 95, 100]);
 const TARGET_LIMITS = new Map([
   [20, 40], [40, 50], [50, 60], [60, 70], [70, 80], [80, 90], [90, 90],
 ]);
@@ -202,7 +203,7 @@ function buildCharacterTarget(profile, settings) {
   let characterCurrent = null;
   let levelPending = false;
   try {
-    characterCurrent = requireProgress(profile.character, '角色等级');
+    characterCurrent = requireCharacterProgress(profile.character);
     levelPending = compareProgress(characterCurrent, characterTarget) < 0;
     outcomes.push({
       kind: 'character', component: 'level', status: levelPending ? 'pending' : 'completed', name: profile.characterName,
@@ -324,6 +325,18 @@ function optionalTalentLevel(talent) {
   if (!Number.isInteger(talent?.displayLevel) || typeof talent?.hasBonus !== 'boolean') return null;
   const level = talent.displayLevel - (talent.hasBonus ? 3 : 0);
   return level >= 1 && level <= 10 ? level : null;
+}
+
+function requireCharacterProgress(value) {
+  const level = value?.level;
+  const levelLimit = value?.levelLimit;
+  // Special-item character levels above 90 are already complete for the legacy
+  // material catalog. This only normalizes current progress; targets stay capped at 90.
+  if (Number.isInteger(level) && Number.isInteger(levelLimit)
+      && level >= 90 && level <= levelLimit && COMPLETED_CHARACTER_LEVEL_LIMITS.has(levelLimit)) {
+    return { level: 90, levelLimit: 90 };
+  }
+  return requireProgress(value, '角色等级');
 }
 
 function requireProgress(value, label) {

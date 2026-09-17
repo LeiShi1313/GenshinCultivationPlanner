@@ -195,7 +195,8 @@ function prepareRequests(preview, identities, rulebook) {
     if (level?.incomplete !== false) throw new Error(`提升指南角色“${characterName}”的等级目标不完整`);
     requirePositiveInteger(level.current, `提升指南角色“${characterName}”的当前等级`);
     let targetLevel = level.target;
-    if (targetLevel === null && level.noUpgradeNeeded === true && level.current === 90) targetLevel = 90;
+    if (targetLevel === null && level.noUpgradeNeeded === true
+        && Number.isInteger(level.current) && level.current >= 90 && level.current <= 100) targetLevel = 90;
     else if (targetLevel === null && level.noUpgradeNeeded === true) {
       throw new Error(`提升指南角色“${characterName}”的无升级等级 ${level.current} 暂不受规则库支持`);
     }
