@@ -3,13 +3,13 @@ import { normalizeLegacyExecution } from './execution-outcome.js';
 /** 生成未处理异常的简短通知；只在用户已确认执行后调用。 */
 export function buildFailureRunSummary({ stage = '运行过程中', targets = [], reason = '未知错误' } = {}) {
   const targetText = Array.isArray(targets) && targets.length > 0 ? targets.join('、') : '未确认';
-  const prefix = '<b>角色一键养成运行失败</b>'
-    + `<br><br><b>培养目标</b>：${escapeHtml(targetText).slice(0, 80)}`
-    + `<br><b>失败阶段</b>：${escapeHtml(stage).slice(0, 40)}`
-    + '<br><b>失败原因</b>：';
-  const suffix = '<br><br>请查看 BetterGI 日志。';
+  const prefix = '角色一键养成运行失败'
+    + `\n\n培养目标：${truncateText(targetText, 80)}`
+    + `\n失败阶段：${truncateText(stage, 40)}`
+    + '\n失败原因：';
+  const suffix = '\n\n请查看 BetterGI 日志。';
   const reasonLimit = Math.max(1, 500 - prefix.length - suffix.length);
-  return `${prefix}${escapeHtml(reason).slice(0, reasonLimit)}${suffix}`;
+  return `${prefix}${truncateText(reason, reasonLimit)}${suffix}`;
 }
 
 /**
@@ -108,27 +108,30 @@ export function buildRunSummary(plan, materials, {
       ? '未确认领取到目标材料，可能是树脂不足或奖励识别为空'
       : '无';
   const sections = [
-    '<b>养成材料调度摘要</b>',
-    `<br><b>本次状态</b>：${action}`,
+    '养成材料调度摘要',
+    `\n本次状态：${action}`,
     (plan.targetSummary ?? []).length > 0
-      ? `<br><br><b>培养档案</b>${formatItems(plan.targetSummary, '无')}`
+      ? `\n\n培养档案${formatItems(plan.targetSummary, '无')}`
       : '',
-    `<br><br><b>本次任务</b>${formatItems(taskResult.tasks, '无树脂任务')}`,
-    `<br><br><b>确认收益</b>${formatItems(gains, confirmedGainFallback)}`,
-    `<br><br><b>路线结果</b>${formatItems(routeResults, '本次无路线任务')}`,
-    warnings.length > 0 ? `<br><br><b>运行警告</b>${formatItems(warnings, '无')}` : '',
+    `\n\n本次任务${formatItems(taskResult.tasks, '无树脂任务')}`,
+    `\n\n确认收益${formatItems(gains, confirmedGainFallback)}`,
+    `\n\n路线结果${formatItems(routeResults, '本次无路线任务')}`,
+    warnings.length > 0 ? `\n\n运行警告${formatItems(warnings, '无')}` : '',
     manualWeekly.length > 0
-      ? `<br><br><b>需手动获取的周本材料</b>${formatItems(manualWeekly, '无')}`
+      ? `\n\n需手动获取的周本材料${formatItems(manualWeekly, '无')}`
       : '',
-    `<br><br><b>仍缺材料</b>${formatItems(remaining, '无')}`,
-    `<br><br><b>${estimate}</b>`,
-    `<br><br><b>今日可执行任务</b>${formatItems(planned, '无')}`,
-    `<br><br><b>本周循环策略</b>${formatItems(weekly, '本周无可执行树脂任务')}`,
+    `\n\n仍缺材料${formatItems(remaining, '无')}`,
+    `\n\n${estimate}`,
+    `\n\n今日可执行任务${formatItems(planned, '无')}`,
+    `\n\n本周循环策略${formatItems(weekly, '本周无可执行树脂任务')}`,
   ];
   let summary = '';
   for (const section of sections) {
     if (!section) continue;
-    if (summary.length + section.length > 500) return `${summary}<br>…`;
+    if (summary.length + section.length > 500) {
+      const ellipsis = '\n…';
+      return summary.length + ellipsis.length <= 500 ? `${summary}${ellipsis}` : summary;
+    }
     summary += section;
   }
   return summary;
@@ -209,13 +212,15 @@ function formatEstimate(days, reason, details) {
 }
 
 function formatItems(items, emptyText) {
-  if (!items.length) return `<br>• ${emptyText}`;
-  return items.map((item) => `<br>• ${item}`).join('');
+  if (!items.length) return `\n• ${emptyText}`;
+  return items.map((item) => `\n• ${item}`).join('');
 }
 
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+function truncateText(value, limit) {
+  let result = '';
+  for (const character of String(value ?? '')) {
+    if (result.length + character.length > limit) break;
+    result += character;
+  }
+  return result;
 }

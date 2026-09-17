@@ -746,7 +746,7 @@ test('运行摘要明确未执行状态、候选任务和无历史数据时的�
   assert.match(summary, /本次未执行/);
   assert.match(summary, /测试天赋书\(12\)/);
   assert.match(summary, /等待累计实际掉落数据/);
-  assert.match(summary, /<br><b>仍缺材料<\/b>/);
+  assert.match(summary, /\n\n仍缺材料\n/);
   assert.match(summary, /今日可执行任务/);
   assert.doesNotMatch(summary, /下一步候选/);
 });
@@ -791,7 +791,7 @@ test('库存未确认时邮件列出材料名称而不是误报无缺口', () =>
     estimateReason: '背包库存未确认，暂无法估算',
   });
   assert.match(summary, /狮牙斗士的镣铐（库存未确认）/);
-  assert.doesNotMatch(summary, /仍缺材料<\/b><br>• 无/);
+  assert.doesNotMatch(summary, /仍缺材料\n• 无/);
 });
 
 test('运行摘要把周本缺口明确列为手动获取', () => {
