@@ -3,6 +3,27 @@
 
 let GUIDE_IDENTITIES;
 
+function normalizeKnownGuideCharacterName(value) {
+  // CN guide OCR can read this name with the traditional first glyph. Keep
+  // the OCR evidence unchanged and normalize only at identity/comparison boundaries.
+  return value === "奧黛塔" ? "奥黛塔" : value;
+}
+
+function normalizeGuideCollectionCharacterNames(collection) {
+  return {
+    ...collection,
+    home: collection && collection.home ? {
+      ...collection.home,
+      characters: Array.isArray(collection.home.characters) ? collection.home.characters.map(function (character) {
+        return { ...character, name: normalizeKnownGuideCharacterName(character.name) };
+      }) : collection.home.characters
+    } : collection && collection.home,
+    characters: collection && Array.isArray(collection.characters) ? collection.characters.map(function (character) {
+      return { ...character, name: normalizeKnownGuideCharacterName(character.name) };
+    }) : collection && collection.characters
+  };
+}
+
 function readGuideJson(path) {
   return JSON.parse(file.ReadTextSync(path));
 }
@@ -504,7 +525,7 @@ function parseCharacterProgress(character) {
     }
   }
   return {
-    name: character && character.name ? character.name : null,
+    name: character && character.name ? normalizeKnownGuideCharacterName(character.name) : null,
     homeLevel: character && Number.isFinite(character.home_level) ? character.home_level : null,
     level: safely(parseLevelPage, pages["角色等级"], { incomplete: true, current: null, target: null }),
     weapon: safely(parseWeaponPage, pages["武器"], {
@@ -539,7 +560,9 @@ function buildPlanPreview(collection, now, identities) {
         const sx = snapshot && snapshot.screen ? snapshot.screen.width / 1920 : NaN;
         const sy = snapshot && snapshot.screen ? snapshot.screen.height / 1080 : NaN;
         const headers = snapshot && Array.isArray(snapshot.regions) ? snapshot.regions.filter(function (region) {
-          return region.text === character.name && region.x >= 700 * sx && region.x < 1450 * sx &&
+          return normalizeKnownGuideCharacterName(region.text) ===
+              normalizeKnownGuideCharacterName(character.name) &&
+            region.x >= 700 * sx && region.x < 1450 * sx &&
             region.y >= 70 * sy && region.y < 210 * sy;
         }) : [];
         if (headers.length !== 1) provenanceIssues.push(character.name + ": detail snapshot header mismatch");
@@ -568,7 +591,8 @@ function buildPlanPreview(collection, now, identities) {
   const collectedCharacters = collection && Array.isArray(collection.characters) ? collection.characters : [];
   if (homeCharacters.length !== collectedCharacters.length || homeCharacters.some(function (home, index) {
       const detail = collectedCharacters[index];
-      return !detail || home.name !== detail.name || home.level !== detail.home_level;
+      return !detail || normalizeKnownGuideCharacterName(home.name) !==
+        normalizeKnownGuideCharacterName(detail.name) || home.level !== detail.home_level;
     })) {
     provenanceIssues.push("Guide home rows do not match collected character details");
   }
@@ -1179,7 +1203,7 @@ async function collectGuideSnapshot(recordFrames = false) {
       const sx = snapshot.screen.width / 1920;
       const sy = snapshot.screen.height / 1080;
       const matches = snapshot.regions.filter(function (region) {
-        return region.text === name &&
+        return normalizeKnownGuideCharacterName(region.text) === normalizeKnownGuideCharacterName(name) &&
           region.x >= 700 * sx && region.x < 1450 * sx &&
           region.y >= 70 * sy && region.y < 210 * sy;
       });
@@ -1266,7 +1290,7 @@ async function collectGuideSnapshot(recordFrames = false) {
       let previous = null;
       let complete = false;
       const coverageIssues = [];
-      const identity = GUIDE_IDENTITIES.characters[characterName];
+      const identity = GUIDE_IDENTITIES.characters[normalizeKnownGuideCharacterName(characterName)];
       const talentNames = identity && Array.isArray(identity.combatSkills)
         ? identity.combatSkills.map(skill => skill.canonicalName) : [];
       function scrollShift(left, right) {
@@ -1542,7 +1566,7 @@ export async function readTrainingGuideSnapshot() {
           [preview && preview.error || "unknown guide error"]);
       throw new Error("提升指南读取不完整：" + details.join("；"));
     }
-    return { collection, preview };
+    return { collection: normalizeGuideCollectionCharacterNames(collection), preview };
   } catch (error) {
     readError = error;
     throw error;
