@@ -1,5 +1,37 @@
 import { normalizeLegacyExecution } from './execution-outcome.js';
 
+export function buildRunStartSummary() {
+  return '角色一键养成已开始\n正在读取培养目标并生成执行计划。';
+}
+
+export function shouldSendRunNotifications(settings = {}) {
+  return settings.sendRunSummary === true && settings.targetInputMode !== '自动档案仅预览';
+}
+
+export function limitNotificationMessage(message, limit = 500) {
+  const text = String(message ?? '');
+  if (text.length <= limit) return text;
+  let result = '';
+  for (const character of text) {
+    if (result.length + character.length + 1 > limit) break;
+    result += character;
+  }
+  return `${result}…`;
+}
+
+/** 这里只报告计划，不把领奖上限或候选任务写成实际执行结果。 */
+export function buildPlanReadySummary({ targetCount = 0, queue = [] } = {}) {
+  const tasks = queue.slice(0, 4).map((item) => {
+    const name = String(item.targetName ?? '未命名任务').slice(0, 40);
+    const limit = item.maxClaims == null ? '计划使用可用预算' : `计划最多领奖${item.maxClaims}次`;
+    return `\n• ${name}（${limit}）`;
+  });
+  return '角色一键养成计划已就绪'
+    + `\n培养目标：${Number(targetCount) || 0} 项`
+    + `\n计划树脂任务：${queue.length} 项${tasks.join('')}`
+    + '\n以上仅为计划；结束摘要会报告确认收益或未确认结果。';
+}
+
 /** 生成未处理异常的简短通知；只在用户已确认执行后调用。 */
 export function buildFailureRunSummary({ stage = '运行过程中', targets = [], reason = '未知错误' } = {}) {
   const targetText = Array.isArray(targets) && targets.length > 0 ? targets.join('、') : '未确认';

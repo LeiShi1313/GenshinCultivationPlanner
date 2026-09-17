@@ -1111,7 +1111,7 @@
   {
     "name": "sendRunSummary",
     "type": "checkbox",
-    "label": "发送运行摘要",
+    "label": "发送关键进度与运行摘要",
     "default": false
   }
 ]

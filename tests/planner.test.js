@@ -4,7 +4,14 @@ import { readFileSync } from 'node:fs';
 import { createPlan } from '../core/planner.js';
 import { applyInventoryScanResult, buildInventoryScanGroups, getInventoryTab, invalidateCraftingFamilies } from '../core/inventory.js';
 import { applyMatchedRouteSupport, discoverAutoPathingRoutes } from '../core/routes.js';
-import { buildFailureRunSummary, buildRunSummary } from '../core/report.js';
+import {
+  buildFailureRunSummary,
+  buildPlanReadySummary,
+  buildRunStartSummary,
+  buildRunSummary,
+  limitNotificationMessage,
+  shouldSendRunNotifications,
+} from '../core/report.js';
 import { collectExecutionWarningOutcomes, collectExecutionWarnings } from '../core/preflight.js';
 import { applyDomainResinPolicyToParam, buildDomainResinPolicy } from '../core/resin.js';
 import { buildDomainExecutionConfig } from '../core/domain-executor.js';
@@ -423,6 +430,8 @@ test('精简设置页的级联默认值有效且不再暴露旧开关', () => {
   assert.equal(items.find((item) => item.name === 'bossOverridesEnabled').default, false);
   assert.equal(bossCatalog.bosses.length, 41);
   assert.equal(names.at(-1), 'sendRunSummary');
+  assert.equal(items.find((item) => item.name === 'sendRunSummary').default, false);
+  assert.equal(items.find((item) => item.name === 'sendRunSummary').label, '发送关键进度与运行摘要');
   const sectionLabels = {
     domainSection: '培养材料秘境',
     gatheringRouteSection: '地方特产路线',
@@ -460,6 +469,36 @@ test('初始化异常摘要保持简短并包含失败阶段', () => {
   assert.match(summary, /角色一键养成运行失败/);
   assert.match(summary, /读取培养目标/);
   assert.match(summary, /等级格式错误/);
+  assert.ok(summary.length <= 500);
+});
+
+test('进度通知使用纯文本并明确区分计划与执行结果', () => {
+  assert.equal(buildRunStartSummary(), '角色一键养成已开始\n正在读取培养目标并生成执行计划。');
+  assert.equal(shouldSendRunNotifications({ sendRunSummary: false, targetInputMode: '自动档案识别后执行' }), false);
+  assert.equal(shouldSendRunNotifications({ sendRunSummary: true, targetInputMode: '自动档案仅预览' }), false);
+  assert.equal(shouldSendRunNotifications({ sendRunSummary: true, targetInputMode: '自动档案识别后执行' }), true);
+  assert.equal(limitNotificationMessage('已完成'), '已完成');
+  assert.equal(limitNotificationMessage(`${'任'.repeat(500)}🙂`).length, 500);
+  assert.match(limitNotificationMessage(`${'任'.repeat(500)}🙂`), /…$/);
+
+  const summary = buildPlanReadySummary({
+    targetCount: 6,
+    queue: [
+      { targetName: '荒坠的圣迹', maxClaims: 1 },
+      { targetName: '逆悬的冰河', maxClaims: null },
+      { targetName: '第三项', maxClaims: 2 },
+      { targetName: '第四项', maxClaims: 3 },
+      { targetName: '不应展开的第五项', maxClaims: 4 },
+    ],
+  });
+  assert.match(summary, /^角色一键养成计划已就绪\n/);
+  assert.match(summary, /培养目标：6 项/);
+  assert.match(summary, /计划树脂任务：5 项/);
+  assert.match(summary, /荒坠的圣迹（计划最多领奖1次）/);
+  assert.match(summary, /逆悬的冰河（计划使用可用预算）/);
+  assert.doesNotMatch(summary, /不应展开的第五项/);
+  assert.match(summary, /以上仅为计划/);
+  assert.doesNotMatch(summary, /<[^>]+>/);
   assert.ok(summary.length <= 500);
 });
 
