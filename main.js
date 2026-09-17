@@ -22,7 +22,7 @@ import {
   validateBossOverrideNames,
 } from './core/settings.js';
 import { readTrainingGuideSnapshot } from './guide-reader/index.js';
-import { appendGuideTargetData, buildGuideTargetData } from './core/guide-targets.js';
+import { appendGuideTargetData, applyGuideLimitedOpenings, buildGuideTargetData } from './core/guide-targets.js';
 import {
   createExecutionOutcome,
   createRunExecution,
@@ -56,7 +56,7 @@ async function main() {
   log.info('[模式] 已确认配置，进入实际执行模式');
 
   failureNotificationState.stage = '读取培养目标';
-  const materials = JSON.parse(file.readTextSync('data/materials.json'));
+  let materials = JSON.parse(file.readTextSync('data/materials.json'));
   const recipes = JSON.parse(file.readTextSync('data/crafting-recipes.json'));
   const rulebook = JSON.parse(file.readTextSync('data/rulebook.json'));
   const bossCatalog = JSON.parse(file.readTextSync('data/bettergi-boss-catalog.json'));
@@ -70,6 +70,7 @@ async function main() {
   let targetData;
   let profileRecord = null;
   let guideRecord = null;
+  let guideTargetData = null;
   let originalConfigured = false;
   let deferredProfilePreview = false;
   let originalProfileCoversGuide = false;
@@ -152,7 +153,7 @@ async function main() {
       const profilesByCharacter = originalProfileCoversGuide && profileRecord?.profile?.characterName
         ? { [profileRecord.profile.characterName]: profileRecord.profile }
         : {};
-      const guideTargetData = await buildGuideTargetData({
+      const builtGuideTargetData = await buildGuideTargetData({
         snapshot,
         identities,
         rulebook,
@@ -161,7 +162,7 @@ async function main() {
       });
       const combined = appendGuideTargetData({
         originalTargetData,
-        guideTargetData,
+        guideTargetData: builtGuideTargetData,
         originalTargetSummary,
         originalTargetOutcomes,
       });
@@ -171,13 +172,14 @@ async function main() {
       guideRecord = combined.guide;
       await file.writeText('record/latest-guide.json', JSON.stringify({
         guide: combined.guide,
-        profiles: guideTargetData.profiles,
+        profiles: builtGuideTargetData.profiles,
         targets: targetData.targets,
         targetSummary,
         targetOutcomes,
         appendedGuideTargets: combined.appendedGuideTargets,
         skippedGuideTargets: combined.skippedGuideTargets,
       }, null, 2), false);
+      guideTargetData = builtGuideTargetData;
       for (const line of guideTargetData.targetSummary) log.info('[提升指南] {summary}', line);
       if (combined.skippedGuideTargets.length > 0) {
         log.info('[提升指南] 原计划优先，已跳过 {count} 个同名同类目标', combined.skippedGuideTargets.length);
@@ -207,6 +209,14 @@ async function main() {
     nowMs: Date.now(),
     serverOffsetMs: ServerTime.GetServerTimeZoneOffset(),
   });
+  const limitedOpenings = scriptSettings.useServerWeekday !== false
+    ? applyGuideLimitedOpenings({ materials, sourceCandidates, rulebook, guideTargetData, today })
+    : { materials, openings: [] };
+  materials = limitedOpenings.materials;
+  for (const opening of limitedOpenings.openings) {
+    log.info('[提升指南] 限时开放：{source} → {domain}（奖励序号 {reward}）；材料={materials}；仅本次计划日 {day}',
+      opening.gameDomainName, opening.domainName, opening.sundaySelectedValue, opening.materialNames.join('、'), today);
+  }
   log.info('[初始化] 目标数量：{count}；计划日：{day}（{source}）', (targetData.targets ?? []).length, today,
     scriptSettings.useServerWeekday !== false ? '服务器时间 04:00 刷新规则' : '手动指定');
   for (const target of targetData.targets ?? []) {

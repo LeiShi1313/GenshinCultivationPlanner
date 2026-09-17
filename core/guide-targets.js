@@ -1,4 +1,5 @@
 import { buildAutomaticProfileTargets, buildTargetSummary, readCharacterProfile } from './character-profile.js';
+import { expandTargets } from './requirements.js';
 
 const MAX_GUIDE_AGE_MS = 5 * 60 * 1000;
 const TALENT_SLOT_KEYS = Object.freeze({
@@ -18,6 +19,7 @@ export async function buildGuideTargetData({
 }) {
   const { collection, preview } = requireFreshGuideSnapshot(snapshot, nowMs);
   const requests = prepareRequests(preview, identities, rulebook);
+  const limitedOpenSources = collectLimitedOpenSources(collection, requests);
   const targets = [];
   const targetSummary = [];
   const targetOutcomes = [];
@@ -77,8 +79,70 @@ export async function buildGuideTargetData({
       capturedAt: collection.completed_at,
       characters: requests.map((request) => request.characterName),
       targetRequests: requests,
+      limitedOpenSources,
     },
   };
+}
+
+/** Apply fresh, exact Training Guide limited-opening evidence to this run's material catalog only. */
+export function applyGuideLimitedOpenings({ materials, sourceCandidates, rulebook, guideTargetData, today }) {
+  if (!materials || !sourceCandidates || !rulebook || !guideTargetData || !Number.isInteger(today)) {
+    return { materials, openings: [] };
+  }
+  const guide = guideTargetData.guide;
+  const requests = Array.isArray(guide?.targetRequests) ? guide.targetRequests : [];
+  const sources = Array.isArray(guide?.limitedOpenSources) ? guide.limitedOpenSources : [];
+  const targets = Array.isArray(guideTargetData.targets) ? guideTargetData.targets : [];
+  let runMaterials = materials;
+  const openings = [];
+
+  for (const source of sources) {
+    const request = requests.find((item) => item.characterName === source.characterName);
+    const matchingTargets = source.page === '角色天赋'
+      ? targets.filter((target) => target.kind === 'character' && target.name === source.characterName)
+      : source.page === '武器' && request
+        ? targets.filter((target) => target.kind === 'weapon' && target.name === request.weapon.name)
+        : [];
+    if (matchingTargets.length === 0) continue;
+    const requiredIds = new Set(expandTargets(matchingTargets, rulebook)
+      .flatMap((target) => target.requirements ?? []).map((item) => String(item.materialId)));
+    const candidates = [...requiredIds].filter((materialId) => {
+      const material = materials[materialId];
+      const candidate = sourceCandidates[materialId];
+      return material?.executionType === 'domain' && material.limited === true
+        && candidate?.type === 'domain'
+        && normalizeSourceText(candidate.gameDomainName) === source.gameDomainName;
+    });
+    const families = new Map();
+    for (const materialId of candidates) {
+      const material = materials[materialId];
+      const key = `${material.domainName}\u0000${material.sundaySelectedValue}`;
+      if (!families.has(key)) families.set(key, []);
+      families.get(key).push(materialId);
+    }
+    if (families.size !== 1) continue;
+    const materialIds = [...families.values()][0];
+    const first = materials[materialIds[0]];
+    if (!first?.domainName || !['1', '2', '3'].includes(String(first.sundaySelectedValue))) continue;
+    const newlyOpenIds = materialIds.filter((materialId) => !(materials[materialId].openDays ?? []).includes(today));
+    if (newlyOpenIds.length === 0) continue;
+    if (runMaterials === materials) runMaterials = { ...materials };
+    for (const materialId of newlyOpenIds) {
+      const material = materials[materialId];
+      runMaterials[materialId] = { ...material, openDays: [...(material.openDays ?? []), today] };
+    }
+    openings.push({
+      characterName: source.characterName,
+      page: source.page,
+      gameDomainName: source.gameDomainName,
+      domainName: first.domainName,
+      sundaySelectedValue: String(first.sundaySelectedValue),
+      materialIds: newlyOpenIds,
+      materialNames: newlyOpenIds.map((materialId) => materials[materialId].name),
+      evidence: source.evidence,
+    });
+  }
+  return { materials: runMaterials, openings };
 }
 
 /** Append non-duplicate guide targets without changing original targets or inventory. */
@@ -137,6 +201,50 @@ export function appendGuideTargetData({
 function requireTargets(targetData, label) {
   if (!targetData || !Array.isArray(targetData.targets)) throw new Error(`${label}无效`);
   return targetData.targets;
+}
+
+function collectLimitedOpenSources(collection, requests) {
+  const requestedNames = new Set(requests.map((request) => request.characterName));
+  const found = new Map();
+  for (const character of collection.characters ?? []) {
+    if (!requestedNames.has(character?.name)) continue;
+    for (const page of ['角色天赋', '武器']) {
+      for (const snapshot of character.pages?.[page]?.snapshots ?? []) {
+        const coverage = snapshot?.coverage;
+        if (coverage?.ok !== true || coverage.frameComplete !== true || coverage.scopeComplete !== true) continue;
+        for (const row of coverage.verified?.sourceRows ?? []) {
+          const rawText = row?.left?.text;
+          const gameDomainName = parseLimitedOpenSource(rawText);
+          if (!gameDomainName) continue;
+          const key = `${character.name}\u0000${page}\u0000${gameDomainName}`;
+          const item = found.get(key) ?? {
+            characterName: character.name,
+            page,
+            gameDomainName,
+            evidence: { snapshotIds: [], rawTexts: [] },
+          };
+          if (typeof snapshot.snapshot_id === 'string' && !item.evidence.snapshotIds.includes(snapshot.snapshot_id)) {
+            item.evidence.snapshotIds.push(snapshot.snapshot_id);
+          }
+          if (typeof rawText === 'string' && !item.evidence.rawTexts.includes(rawText)) item.evidence.rawTexts.push(rawText);
+          found.set(key, item);
+        }
+      }
+    }
+  }
+  return [...found.values()];
+}
+
+function parseLimitedOpenSource(value) {
+  const text = normalizeSourceText(value);
+  const match = text.match(/^(.+)\(限时开放\)$/);
+  return match?.[1] || null;
+}
+
+function normalizeSourceText(value) {
+  return typeof value === 'string'
+    ? value.replace(/[\s\u3000]+/g, '').replaceAll('：', ':').replaceAll('（', '(').replaceAll('）', ')')
+    : '';
 }
 
 function targetIdentity(target) {
