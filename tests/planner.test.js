@@ -33,6 +33,8 @@ test('所有树脂任务默认启用 BetterGI 奖励识别', () => {
 test('BetterGI 0.64 自动秘境参数显式采用脚本配置的树脂优先级', () => {
   const values = [];
   const param = {
+    OriginalResin20UseCount: 7,
+    OriginalResin40UseCount: 8,
     ResinPriorityList: {
       Clear() { values.length = 0; },
       Add(value) { values.push(value); },
@@ -50,6 +52,8 @@ test('BetterGI 0.64 自动秘境参数显式采用脚本配置的树脂优先级
   assert.deepEqual(values, ['原粹树脂', '须臾树脂']);
   assert.equal(param.SpecifyResinUse, true);
   assert.equal(param.OriginalResinUseCount, 2);
+  assert.equal(param.OriginalResin20UseCount, 0);
+  assert.equal(param.OriginalResin40UseCount, 0);
   assert.equal(param.TransientResinUseCount, 1);
   assert.throws(() => applyDomainResinPolicyToParam({}, policy), /BetterGI 0\.64\.0/);
 });
@@ -1554,7 +1558,9 @@ test('圣遗物秘境仅在当天没有培养树脂任务时作为可选填充',
   }, buildDomainResinPolicy({}));
   assert.equal(singleRunConfig.testSingleRun, true);
   assert.deepEqual(singleRunConfig.resinPolicy.priority, ['原粹树脂']);
-  assert.equal(singleRunConfig.resinPolicy.originalResinUseCount, 1);
+  assert.equal(singleRunConfig.resinPolicy.originalResinUseCount, 0);
+  assert.equal(singleRunConfig.resinPolicy.originalResin20UseCount, 1);
+  assert.equal(singleRunConfig.resinPolicy.originalResin40UseCount, 0);
 });
 
 test('秘境执行配置必须具备队伍、映射任务和允许树脂', () => {
@@ -1587,7 +1593,9 @@ test('培养秘境单次测试只允许领取一次原粹树脂奖励', () => {
   );
   assert.equal(config.testSingleRun, true);
   assert.deepEqual(config.resinPolicy.priority, ['原粹树脂']);
-  assert.equal(config.resinPolicy.originalResinUseCount, 1);
+  assert.equal(config.resinPolicy.originalResinUseCount, 0);
+  assert.equal(config.resinPolicy.originalResin20UseCount, 1);
+  assert.equal(config.resinPolicy.originalResin40UseCount, 0);
   assert.equal(config.resinPolicy.condensedResinUseCount, 0);
   assert.equal(config.resinPolicy.transientResinUseCount, 0);
   assert.equal(config.resinPolicy.fragileResinUseCount, 0);
