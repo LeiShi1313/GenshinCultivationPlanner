@@ -33,12 +33,28 @@ export async function buildGuideTargetData({
       throw new Error(`角色档案返回“${profile?.characterName ?? '未知角色'}”，与提升指南“${request.characterName}”不一致`);
     }
     const settings = buildProfileSettings(request, profile);
-    const generated = buildAutomaticProfileTargets(profile, settings, rulebook, {
+    const guideLevelCompleted = request.level.noUpgradeNeeded === true
+      && request.level.current >= 90 && request.level.current <= 100 && request.level.target === 90;
+    const planningProfile = guideLevelCompleted ? {
+      ...profile,
+      character: { ...profile.character, level: 90, levelLimit: 90 },
+    } : profile;
+    const generated = buildAutomaticProfileTargets(planningProfile, settings, rulebook, {
       characterName: request.characterName,
       cultivationMode: '培养角色和当前佩戴武器',
       requiresProfile: true,
       previewOnly: false,
     });
+    if (guideLevelCompleted) {
+      const actual = `${profile.character.level}/${profile.character.levelLimit}`;
+      const levelOutcome = generated.targetOutcomes.find((outcome) =>
+        outcome.kind === 'character' && outcome.component === 'level');
+      if (levelOutcome?.status !== 'completed') {
+        throw new Error(`提升指南角色“${request.characterName}”的普通等级完成态无法生成`);
+      }
+      levelOutcome.message = `提升指南明确无需提升；档案原始等级 ${actual}，普通等级材料规划按 90/90 已完成处理`;
+      generated.summary.unshift(`角色 ${request.characterName}：提升指南明确无需提升；档案原始等级 ${actual}，普通等级材料规划按 90/90 已完成处理`);
+    }
     const failures = generated.targetOutcomes.filter((outcome) => outcome.status === 'failed');
     if (failures.length > 0) {
       throw new Error(`提升指南角色“${request.characterName}”无法生成完整目标：${failures.map((item) => item.message).join('；')}`);
@@ -232,7 +248,11 @@ function prepareRequests(preview, identities, rulebook) {
 
     return {
       characterName,
-      level: { current: level.current, target: targetLevel },
+      level: {
+        current: level.current,
+        target: targetLevel,
+        noUpgradeNeeded: level.noUpgradeNeeded === true,
+      },
       weapon: { name: weaponName, current: weapon.current, target: weapon.target },
       talents,
     };
