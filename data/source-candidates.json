@@ -209,6 +209,32 @@
       "石珀"
     ]
   },
+  "101275": {
+    "materialId": "101275",
+    "name": "霜仙花",
+    "sources": [
+      "推荐：至冬堡附近采集",
+      "推荐：白桦雪葬地采集",
+      "前往采集"
+    ],
+    "type": "localSpecialty",
+    "routeNames": [
+      "霜仙花"
+    ]
+  },
+  "101277": {
+    "materialId": "101277",
+    "name": "金蕨",
+    "sources": [
+      "推荐：焰羽谷采集",
+      "推荐：曙光车站附近采集",
+      "前往采集"
+    ],
+    "type": "localSpecialty",
+    "routeNames": [
+      "金蕨"
+    ]
+  },
   "104301": {
     "materialId": "104301",
     "name": "「自由」的教导",
@@ -1241,6 +1267,48 @@
     "daysOfWeek": [
       "周二",
       "周五",
+      "周日"
+    ]
+  },
+  "104371": {
+    "materialId": "104371",
+    "name": "「荣光」的教导",
+    "sources": [
+      "礼包商城兑换"
+    ],
+    "type": "domain",
+    "gameDomainName": "精通秘境：共观",
+    "daysOfWeek": [
+      "周三",
+      "周六",
+      "周日"
+    ]
+  },
+  "104372": {
+    "materialId": "104372",
+    "name": "「荣光」的指引",
+    "sources": [
+      "占位-可合成数量:{0}"
+    ],
+    "type": "domain",
+    "gameDomainName": "精通秘境：共观",
+    "daysOfWeek": [
+      "周三",
+      "周六",
+      "周日"
+    ]
+  },
+  "104373": {
+    "materialId": "104373",
+    "name": "「荣光」的哲学",
+    "sources": [
+      "占位-可合成数量:{0}"
+    ],
+    "type": "domain",
+    "gameDomainName": "精通秘境：共观",
+    "daysOfWeek": [
+      "周三",
+      "周六",
       "周日"
     ]
   },
@@ -3841,6 +3909,17 @@
     "type": "worldBoss",
     "bossNames": [
       "嵌合翼骏狮"
+    ]
+  },
+  "113092": {
+    "materialId": "113092",
+    "name": "游离者的裂甲",
+    "sources": [
+      "30级以上游雪的护刃掉落"
+    ],
+    "type": "worldBoss",
+    "bossNames": [
+      "游雪的护刃"
     ]
   },
   "114001": {
