@@ -349,7 +349,7 @@ test('培养档案摘要进入邮件和历史记录', () => {
     execution: { status: 'skipped', code: 'no_candidate', reason: '没有缺口' },
     estimateReason: '暂无可估算任务',
   });
-  assert.match(summary, /<b>培养档案<\/b>/);
+  assert.match(summary, /\n\n培养档案\n/);
   assert.match(summary, /角色 申鹤：80\/90 → 90\/90/);
   const record = buildRunRecord({
     executionEnabled: true, plan, inventoryBefore: {}, inventoryAfter: {},

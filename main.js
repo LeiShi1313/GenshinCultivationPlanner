@@ -1,7 +1,14 @@
 import { createPlan } from './core/planner.js';
 import { applyInventoryScanResult, buildInventoryScanGroups, invalidateCraftingFamilies } from './core/inventory.js';
 import { applyMatchedRouteSupport, discoverAutoPathingRoutes } from './core/routes.js';
-import { buildFailureRunSummary, buildRunSummary } from './core/report.js';
+import {
+  buildFailureRunSummary,
+  buildPlanReadySummary,
+  buildRunStartSummary,
+  buildRunSummary,
+  limitNotificationMessage,
+  shouldSendRunNotifications,
+} from './core/report.js';
 import { collectExecutionWarningOutcomes } from './core/preflight.js';
 import { applyDomainResinPolicyToParam, buildDomainResinPolicy } from './core/resin.js';
 import { compileResinPolicyV2, formatResinPolicyPreview } from './core/resin-policy-v2.js';
@@ -39,7 +46,7 @@ import {
   readCharacterProfile,
 } from './core/character-profile.js';
 
-const failureNotificationState = { settings: null, stage: '初始化' };
+const failureNotificationState = { enabled: false, settings: null, stage: '初始化' };
 
 async function main() {
   let scriptSettings;
@@ -53,7 +60,9 @@ async function main() {
   }
   const executionEnabled = true;
   failureNotificationState.settings = scriptSettings;
+  failureNotificationState.enabled = shouldSendRunNotifications(scriptSettings);
   log.info('[模式] 已确认配置，进入实际执行模式');
+  sendNotificationSafely(() => buildRunStartSummary(), '开始进度');
 
   failureNotificationState.stage = '读取培养目标';
   let materials = JSON.parse(file.readTextSync('data/materials.json'));
@@ -386,6 +395,11 @@ async function main() {
   }
   plan.domainResinPolicy = domainResinPolicy;
   plan.resinPolicyV2 = resinPolicyV2;
+  sendNotificationSafely(() => buildPlanReadySummary({
+    targetCount: (targetData.targets ?? []).length,
+    targetSummary,
+    queue: plan.executionQueue,
+  }), '执行计划进度');
   const inventoryBeforeExecution = { ...inventory };
   const trackedMaterialIds = [...plan.crafting.scanMaterialIds];
 
@@ -407,14 +421,7 @@ async function main() {
       }
     }
     if (execution.status !== 'failed' && !allTargetsSatisfied) {
-      execution = await executeResinQueue(
-        compiledQueue.entries,
-        scriptSettings,
-        partySwitchState,
-        historicalInventoryConflicts.length > 0
-          ? '执行前背包识别与历史确认记录冲突，已暂停相关任务'
-          : null,
-      );
+      execution = await executeResinQueue(compiledQueue.entries, scriptSettings, partySwitchState);
     }
     execution.warnings = [...runWarnings, ...(execution.warnings ?? [])];
     plan.execution = execution;
@@ -615,17 +622,15 @@ async function main() {
   const updatedHistory = appendRunHistory(history, runRecord);
   await file.writeText('record/history.json', JSON.stringify(updatedHistory, null, 2), false);
   log.info('[记录] 已保存本次运行记录；历史保留 {count} 条', updatedHistory.length);
-  if (scriptSettings.sendRunSummary === true) {
+  if (failureNotificationState.enabled) {
     failureNotificationState.stage = '发送运行摘要';
-    const summary = buildRunSummary(plan, materials, {
+    sendNotificationSafely(() => buildRunSummary(plan, materials, {
       executionEnabled,
       execution: plan.execution,
       estimateDays: estimate.days,
       estimateReason: estimate.reason,
       estimateDetails: estimate.details,
-    });
-    notification.Send(summary);
-    log.info('[通知] 已请求 BetterGI 发送运行摘要；请在 BetterGI 通知设置中启用 JS 通知与邮件通知');
+    }), '运行摘要');
   }
   const routeCount = plan.execution?.routes?.length ?? 0;
   const resinTaskCount = plan.execution?.tasks?.length ?? 0;
@@ -643,21 +648,26 @@ async function main() {
   log.info('[完成] 已保存计划记录：record/latest-plan.json；{result}', finalResult);
 }
 
+/** 通知失败不能中断培养流程。 */
+function sendNotificationSafely(buildMessage, label) {
+  if (!failureNotificationState.enabled) return;
+  try {
+    notification.Send(limitNotificationMessage(buildMessage()));
+    log.info('[通知] 已请求 BetterGI 发送{label}', label);
+  } catch (error) {
+    log.error('[通知] 发送{label}失败，已继续原流程：{error}', label, error?.message ?? String(error));
+  }
+}
+
 /** 失败通知自身不能覆盖原始异常。 */
 function sendFailureSummarySafely(error) {
   const scriptSettings = failureNotificationState.settings;
-  if (scriptSettings?.sendRunSummary !== true) return;
-  try {
-    const summary = buildFailureRunSummary({
-      stage: failureNotificationState.stage,
-      targets: scriptSettings.targetsText ? [scriptSettings.targetsText] : [],
-      reason: error?.message ?? String(error),
-    });
-    notification.Send(summary);
-    log.info('[通知] 已请求 BetterGI 发送失败摘要；原始异常仍会继续抛出');
-  } catch (notificationError) {
-    log.error('[通知] 发送失败摘要时再次出错：{error}', notificationError?.message ?? String(notificationError));
-  }
+  if (!failureNotificationState.enabled || scriptSettings?.sendRunSummary !== true) return;
+  sendNotificationSafely(() => buildFailureRunSummary({
+    stage: failureNotificationState.stage,
+    targets: scriptSettings.targetsText ? [scriptSettings.targetsText] : [],
+    reason: error?.message ?? String(error),
+  }), '失败摘要');
 }
 
 function loadTargets(scriptSettings, rulebook) {
@@ -687,9 +697,9 @@ function attachTargetContext(plan, profile, targetSummary, guide = null, targetO
   if (guide) plan.guide = guide;
 }
 
-async function executeResinQueue(entries, settings, partySwitchState, emptyReason = null) {
+async function executeResinQueue(entries, settings, partySwitchState) {
   if (entries.length === 0) {
-    const reason = emptyReason || '今日没有已启用的树脂任务';
+    const reason = '今日没有已启用的树脂任务';
     log.info('[执行] {reason}，本次不执行', reason);
     return createRunExecution({
       status: 'skipped', code: 'no_candidate', stage: 'preflight',
