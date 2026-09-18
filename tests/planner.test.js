@@ -483,6 +483,13 @@ test('进度通知使用纯文本并明确区分计划与执行结果', () => {
 
   const summary = buildPlanReadySummary({
     targetCount: 6,
+    targetSummary: [
+      '角色 桑多涅：90/90 → 90/90',
+      '天赋：爆发8→10',
+      '角色 奥黛塔：90/90 → 90/90',
+      '天赋：普攻1→6，战技9→10，爆发1→9',
+      `补充目标：${'很长'.repeat(300)}`,
+    ],
     queue: [
       { targetName: '荒坠的圣迹', maxClaims: 1 },
       { targetName: '逆悬的冰河', maxClaims: null },
@@ -493,11 +500,14 @@ test('进度通知使用纯文本并明确区分计划与执行结果', () => {
   });
   assert.match(summary, /^角色一键养成计划已就绪\n/);
   assert.match(summary, /培养目标：6 项/);
+  assert.match(summary, /培养计划\n• 角色 桑多涅：90\/90 → 90\/90/);
+  assert.match(summary, /天赋：爆发8→10/);
   assert.match(summary, /计划树脂任务：5 项/);
   assert.match(summary, /荒坠的圣迹（计划最多领奖1次）/);
   assert.match(summary, /逆悬的冰河（计划使用可用预算）/);
   assert.doesNotMatch(summary, /不应展开的第五项/);
   assert.match(summary, /以上仅为计划/);
+  assert.match(summary, /…/);
   assert.doesNotMatch(summary, /<[^>]+>/);
   assert.ok(summary.length <= 500);
 });

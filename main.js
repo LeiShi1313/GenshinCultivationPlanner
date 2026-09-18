@@ -308,6 +308,7 @@ async function main() {
   plan.resinPolicyV2 = resinPolicyV2;
   sendNotificationSafely(() => buildPlanReadySummary({
     targetCount: (targetData.targets ?? []).length,
+    targetSummary,
     queue: plan.executionQueue,
   }), '执行计划进度');
   const inventoryBeforeExecution = { ...inventory };
@@ -331,14 +332,7 @@ async function main() {
       }
     }
     if (execution.status !== 'failed' && !allTargetsSatisfied) {
-      execution = await executeResinQueue(
-        compiledQueue.entries,
-        scriptSettings,
-        partySwitchState,
-        historicalInventoryConflicts.length > 0
-          ? '执行前背包识别与历史确认记录冲突，已暂停相关任务'
-          : null,
-      );
+      execution = await executeResinQueue(compiledQueue.entries, scriptSettings, partySwitchState);
     }
     execution.warnings = [...runWarnings, ...(execution.warnings ?? [])];
     plan.execution = execution;
@@ -604,9 +598,9 @@ function attachTargetContext(plan, profile, targetSummary) {
   plan.targetOutcomes = profile?.targetOutcomes ?? [];
 }
 
-async function executeResinQueue(entries, settings, partySwitchState, emptyReason = null) {
+async function executeResinQueue(entries, settings, partySwitchState) {
   if (entries.length === 0) {
-    const reason = emptyReason || '今日没有已启用的树脂任务';
+    const reason = '今日没有已启用的树脂任务';
     log.info('[执行] {reason}，本次不执行', reason);
     return createRunExecution({
       status: 'skipped', code: 'no_candidate', stage: 'preflight',

@@ -20,16 +20,23 @@ export function limitNotificationMessage(message, limit = 500) {
 }
 
 /** 这里只报告计划，不把领奖上限或候选任务写成实际执行结果。 */
-export function buildPlanReadySummary({ targetCount = 0, queue = [] } = {}) {
+export function buildPlanReadySummary({ targetCount = 0, targetSummary = [], queue = [] } = {}) {
   const tasks = queue.slice(0, 4).map((item) => {
     const name = String(item.targetName ?? '未命名任务').slice(0, 40);
     const limit = item.maxClaims == null ? '计划使用可用预算' : `计划最多领奖${item.maxClaims}次`;
     return `\n• ${name}（${limit}）`;
   });
-  return '角色一键养成计划已就绪'
+  const prefix = '角色一键养成计划已就绪'
     + `\n培养目标：${Number(targetCount) || 0} 项`
-    + `\n计划树脂任务：${queue.length} 项${tasks.join('')}`
-    + '\n以上仅为计划；结束摘要会报告确认收益或未确认结果。';
+    + `\n计划树脂任务：${queue.length} 项${tasks.join('')}`;
+  const suffix = '\n以上仅为计划；结束摘要会报告确认收益或未确认结果。';
+  const details = Array.isArray(targetSummary)
+    ? targetSummary.filter((item) => typeof item === 'string' && item.trim()).map((item) => `\n• ${item.trim()}`).join('')
+    : '';
+  const section = '\n培养计划';
+  const detailBudget = 500 - prefix.length - section.length - suffix.length;
+  const fittedDetails = details && detailBudget > 1 ? limitNotificationMessage(details, detailBudget) : '';
+  return `${prefix}${fittedDetails ? `${section}${fittedDetails}` : ''}${suffix}`;
 }
 
 /** 生成未处理异常的简短通知；只在用户已确认执行后调用。 */
