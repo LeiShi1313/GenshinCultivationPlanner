@@ -365,7 +365,8 @@ test('精简设置页的级联默认值有效且不再暴露旧开关', () => {
     'bossOverride2Name', 'bossOverride2Action', 'bossOverride2TeamName', 'bossOverride2StrategyName',
     'bossOverride3Name', 'bossOverride3Action', 'bossOverride3TeamName', 'bossOverride3StrategyName',
   ]);
-  assert.equal(editableItems.length, 35);
+  assert.equal(editableItems.length, 36);
+  assert.equal(items.find((item) => item.name === 'additionalTargetsFile')?.default, '');
   assert.equal(editableItems.some((item) => legacyNames.has(item.name)), false);
   for (const item of items.filter((candidate) => candidate.type === 'cascade-select')) {
     const values = Object.values(item.cascadeOptions).flat();

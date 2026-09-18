@@ -1,4 +1,5 @@
 import { createPlan } from './core/planner.js';
+import { resolvePlannedTargets, validatePlannedTargets } from './core/prefarm-targets.js';
 import { applyInventoryScanResult, buildInventoryScanGroups, invalidateCraftingFamilies } from './core/inventory.js';
 import { applyMatchedRouteSupport, discoverAutoPathingRoutes } from './core/routes.js';
 import { buildFailureRunSummary, buildRunSummary } from './core/report.js';
@@ -50,9 +51,26 @@ async function main() {
   log.info('[模式] 已确认配置，进入实际执行模式');
 
   failureNotificationState.stage = '读取培养目标';
-  const materials = JSON.parse(file.readTextSync('data/materials.json'));
-  const recipes = JSON.parse(file.readTextSync('data/crafting-recipes.json'));
-  const rulebook = JSON.parse(file.readTextSync('data/rulebook.json'));
+  let materials = JSON.parse(file.readTextSync('data/materials.json'));
+  let recipes = JSON.parse(file.readTextSync('data/crafting-recipes.json'));
+  let rulebook = JSON.parse(file.readTextSync('data/rulebook.json'));
+  let sourceCandidates = null;
+  const additionalTargetsFile = String(scriptSettings.additionalTargetsFile ?? '').trim();
+  let additionalPlan = null;
+  let additionalTargets = [];
+  let additionalInventory = {};
+  let observedCharacters = null;
+  if (additionalTargetsFile) {
+    additionalPlan = JSON.parse(file.readTextSync(additionalTargetsFile));
+    if (!additionalPlan || typeof additionalPlan !== 'object' || Array.isArray(additionalPlan)) {
+      throw new Error('附加培养计划必须是对象');
+    }
+    if (!Array.isArray(additionalPlan.targets)) throw new Error('附加培养计划缺少 targets 数组');
+    if (additionalPlan.rules != null) throw new Error('附加培养计划不支持内联 rules；请更新脚本的标准数据文件');
+    additionalTargets = validatePlannedTargets(additionalPlan.targets, rulebook);
+    additionalInventory = validateAdditionalInventory(additionalPlan.inventory, materials);
+    observedCharacters = loadObservedCharacters('record/prefarm-observed.json');
+  }
   const bossCatalog = JSON.parse(file.readTextSync('data/bettergi-boss-catalog.json'));
   let history = [];
   try {
@@ -63,9 +81,19 @@ async function main() {
   validateBossOverrideNames(scriptSettings, bossCatalog);
   let targetData;
   let profileRecord = null;
-  if (isAutomaticProfileMode(scriptSettings)) {
+  let plannedRecord = null;
+  const noOriginalSelection = !scriptSettings.selectedCharacter || scriptSettings.selectedCharacter === '不选择角色';
+  const noOriginalWeapon = !scriptSettings.selectedWeapon || scriptSettings.selectedWeapon === '不选择武器';
+  if (additionalPlan && isAutomaticProfileMode(scriptSettings) && noOriginalSelection && noOriginalWeapon) {
+    targetData = { targets: [], inventory: {} };
+  } else if (isAutomaticProfileMode(scriptSettings)) {
     try {
       const request = prepareAutomaticProfileRequest(scriptSettings, rulebook);
+      if (request.requiresProfile && additionalTargets.some((target) => (
+        target.kind === 'character' && target.name === request.characterName && target.weapon
+      ))) {
+        request.categories = '属性;武器;天赋';
+      }
       const service = typeof characterDevelopmentTask === 'undefined' ? null : characterDevelopmentTask;
       let profile = null;
       let profileError = null;
@@ -80,7 +108,7 @@ async function main() {
       }
       const generated = buildAutomaticProfileTargets(profile, scriptSettings, rulebook, request, profileError);
       const failedOutcomes = generated.targetOutcomes.filter((outcome) => outcome.status === 'failed');
-      if (generated.targets.length === 0 && failedOutcomes.length > 0) {
+      if (!additionalPlan && generated.targets.length === 0 && failedOutcomes.length > 0) {
         throw new Error(`没有可继续处理的培养目标：${failedOutcomes.map((outcome) => outcome.message).join('；')}`);
       }
       targetData = { targets: generated.targets, inventory: {} };
@@ -106,8 +134,10 @@ async function main() {
       }
       log.info('[自动档案] 已保存识别记录：record/latest-profile.json');
       if (request.previewOnly) {
-        log.info('[自动档案] 仅预览模式已完成；未读取背包、未执行刷取任务、未发送通知');
-        return;
+        if (!additionalPlan) {
+          log.info('[自动档案] 仅预览模式已完成；未读取背包、未执行刷取任务、未发送通知');
+          return;
+        }
       }
     } catch (error) {
       const code = /未提供 characterDevelopmentTask\.GetCharacter/.test(error?.message ?? '')
@@ -119,8 +149,61 @@ async function main() {
   } else {
     targetData = loadTargets(scriptSettings, rulebook);
   }
-  const targetSummary = profileRecord?.targetSummary ?? buildTargetSummary(targetData.targets ?? []);
-  const sourceCandidates = JSON.parse(file.readTextSync('data/source-candidates.json'));
+  let targetSummary = profileRecord?.targetSummary ?? buildTargetSummary(targetData.targets ?? []);
+  let targetOutcomes = profileRecord?.targetOutcomes ?? [];
+  if (additionalPlan) {
+    const existing = new Set([...(targetData.targets ?? []), ...targetOutcomes].map(targetIdentity));
+    const observedPath = 'record/prefarm-observed.json';
+    const plannedCharacterNames = new Set(additionalTargets
+      .filter((target) => target.kind === 'character')
+      .map((target) => target.name));
+    const originalProfile = profileRecord?.profile;
+    if (originalProfile && plannedCharacterNames.has(originalProfile.characterName)
+      && observedCharacters[originalProfile.characterName] !== true) {
+      observedCharacters[originalProfile.characterName] = true;
+      await persistObservedCharacters(observedPath, observedCharacters);
+    }
+    const service = typeof characterDevelopmentTask === 'undefined' ? null : characterDevelopmentTask;
+    const profilesByCharacter = originalProfile?.characterName
+      ? { [originalProfile.characterName]: originalProfile } : {};
+    const resolvedAdditionalRecord = await resolvePlannedTargets({
+      targets: additionalTargets,
+      rulebook,
+      service,
+      observedCharacters,
+      profilesByCharacter,
+    });
+    const additionalRecord = filterResolvedAdditional(resolvedAdditionalRecord, existing);
+    if (JSON.stringify(additionalRecord.observedCharacters) !== JSON.stringify(observedCharacters)) {
+      await persistObservedCharacters(observedPath, additionalRecord.observedCharacters);
+    }
+    targetData = {
+      ...targetData,
+      inventory: { ...additionalInventory, ...(targetData.inventory ?? {}) },
+      targets: mergeTargets(targetData.targets ?? [], additionalRecord.targets),
+    };
+    targetSummary = [...targetSummary, ...additionalRecord.targetSummary];
+    targetOutcomes = [...targetOutcomes, ...additionalRecord.targetOutcomes];
+    plannedRecord = {
+      targets: targetData.targets,
+      targetSummary,
+      targetOutcomes,
+      profiles: mergeProfiles(originalProfile ? [originalProfile] : [], additionalRecord.profiles),
+      observedCharacters: additionalRecord.observedCharacters,
+      warnings: additionalRecord.warnings,
+    };
+    await file.writeText('record/latest-planned-targets.json', JSON.stringify(plannedRecord, null, 2), false);
+    for (const line of additionalRecord.targetSummary) log.info('[附加培养计划] {summary}', line);
+    for (const warning of additionalRecord.warnings) log.warn('[附加培养计划] {warning}', warning);
+    if (!targetData.targets.length && targetOutcomes.some((outcome) => outcome.status === 'failed')) {
+      throw new Error('培养目标读取失败，没有可安全执行的有效目标');
+    }
+    if (scriptSettings.targetInputMode === '自动档案仅预览') {
+      log.info('[附加培养计划] 目标预览已完成，未读取背包或执行刷取');
+      return;
+    }
+  }
+  sourceCandidates ??= JSON.parse(file.readTextSync('data/source-candidates.json'));
   const routeOverrides = JSON.parse(file.readTextSync('data/route-overrides.json'));
   const today = resolvePlanningWeekday({
     automatic: scriptSettings.useServerWeekday !== false,
@@ -133,9 +216,9 @@ async function main() {
   for (const target of targetData.targets ?? []) {
     log.info('[目标] {kind}：{name}', target.kind, target.name);
   }
-  const allTargetsSatisfied = profileRecord != null
+  const allTargetsSatisfied = (profileRecord != null || plannedRecord != null)
     && (targetData.targets ?? []).length === 0
-    && !(profileRecord.targetOutcomes ?? []).some((outcome) => outcome.status === 'failed');
+    && !targetOutcomes.some((outcome) => outcome.status === 'failed');
   if (allTargetsSatisfied) {
     log.info('[目标] 所选培养目标均已达到，本次不读取背包、不检查路线且不执行刷取任务');
   }
@@ -153,7 +236,7 @@ async function main() {
     rulebook,
     today,
   });
-  attachTargetContext(plan, profileRecord, targetSummary);
+  attachTargetContext(plan, profileRecord, targetSummary, targetOutcomes);
 
   // 兼容 BetterGI 已保存的旧设置：字段不存在时也默认开启读取。
   if (!allTargetsSatisfied && scriptSettings.scanInventory !== false) {
@@ -165,6 +248,13 @@ async function main() {
       ...initialInventoryScan.issueNames,
       ...initialInventoryScan.notFoundNames,
     ])];
+    if (initialInventoryScan.uncertainMaterialIds.length > 0) {
+      inventory = invalidateCraftingFamilies(
+        inventory,
+        initialInventoryScan.uncertainMaterialIds,
+        recipes,
+      ).inventory;
+    }
     historicalInventoryConflicts = findHistoricalInventoryConflicts(
       history,
       initialInventoryScan.notFoundNames,
@@ -208,7 +298,7 @@ async function main() {
       rulebook,
       today,
     });
-    attachTargetContext(plan, profileRecord, targetSummary);
+    attachTargetContext(plan, profileRecord, targetSummary, targetOutcomes);
     plan.inventoryUncertainties = historicalInventoryConflicts;
   } else if (!allTargetsSatisfied) {
     log.info('[背包] 已关闭自动读取，库存仅使用目标文件中的 inventory 字段');
@@ -464,7 +554,7 @@ async function main() {
         rulebook,
         today,
       });
-      attachTargetContext(plan, profileRecord, targetSummary);
+      attachTargetContext(plan, profileRecord, targetSummary, targetOutcomes);
       plan.routes = discoveredRoutes;
       applyMatchedRouteSupport(plan, discoveredRoutes);
       plan.weeklyStrategy = buildWeeklyStrategy(plan.weeklyPlan, today);
@@ -582,10 +672,124 @@ function loadTargets(scriptSettings, rulebook) {
   return JSON.parse(file.readTextSync(targetFile));
 }
 
-function attachTargetContext(plan, profile, targetSummary) {
+function validateAdditionalInventory(value, materials) {
+  if (value == null) return {};
+  if (typeof value !== 'object' || Array.isArray(value)) throw new Error('附加培养计划的 inventory 必须是对象');
+  const materialIdByName = new Map();
+  for (const [materialId, material] of Object.entries(materials)) {
+    if (typeof material?.name !== 'string' || !material.name.trim()) {
+      throw new Error(`材料库中的材料 ${materialId} 缺少有效名称`);
+    }
+    if (materialIdByName.has(material.name)) {
+      throw new Error(`材料库名称重复：${material.name}`);
+    }
+    materialIdByName.set(material.name, materialId);
+  }
+  const inventory = {};
+  for (const [key, count] of Object.entries(value)) {
+    if (!key.trim() || key !== key.trim() || ['__proto__', 'constructor', 'prototype'].includes(key)) {
+      throw new Error(`附加培养计划的库存名称无效：${key}`);
+    }
+    const materialId = Object.hasOwn(materials, key) ? key : materialIdByName.get(key);
+    if (!materialId) {
+      throw new Error(`附加培养计划的库存材料不在材料库中：${key}`);
+    }
+    if (!Number.isSafeInteger(count) || count < 0) throw new Error(`附加培养计划的库存数量无效：${key}`);
+    if (Object.hasOwn(inventory, materialId)) {
+      throw new Error(`附加培养计划的库存重复填写同一材料：${materials[materialId].name}`);
+    }
+    inventory[materialId] = count;
+  }
+  return inventory;
+}
+
+function loadObservedCharacters(path) {
+  if (!file.IsFile(path)) return {};
+  let observed;
+  try {
+    observed = JSON.parse(file.readTextSync(path));
+  } catch {
+    throw new Error('预培养实读记录损坏，拒绝回退到初始进度');
+  }
+  if (!observed || typeof observed !== 'object' || Array.isArray(observed)) {
+    throw new Error('预培养实读记录损坏，拒绝回退到初始进度');
+  }
+  for (const [name, value] of Object.entries(observed)) {
+    if (!name.trim() || ['__proto__', 'constructor', 'prototype'].includes(name) || value !== true) {
+      throw new Error('预培养实读记录损坏，拒绝回退到初始进度');
+    }
+  }
+  return observed;
+}
+
+async function persistObservedCharacters(path, observedCharacters) {
+  const text = JSON.stringify(observedCharacters);
+  try {
+    await file.writeText(path, text, false);
+    if (file.readTextSync(path) !== text) throw new Error('写入后校验不一致');
+  } catch (error) {
+    throw new Error(`无法保存预培养实读记录，已停止执行：${error?.message ?? String(error)}`);
+  }
+}
+
+function filterResolvedAdditional(record, existing) {
+  const shadowedCharacters = new Set([...existing]
+    .filter((identity) => identity.startsWith('character:'))
+    .map((identity) => identity.slice('character:'.length)));
+  const shadowedWeapons = new Set([...existing]
+    .filter((identity) => identity.startsWith('weapon:'))
+    .map((identity) => identity.slice('weapon:'.length)));
+  const shouldKeepSummary = (line) => {
+    for (const name of shadowedCharacters) {
+      if (line.startsWith(`角色 ${name}：`) || line.startsWith(`角色 ${name} 天赋：`) || line.startsWith(`角色 ${name} 档案未确认`)) {
+        return false;
+      }
+    }
+    for (const name of shadowedWeapons) {
+      if (line.startsWith(`武器 ${name}：`) || line.includes(`当前佩戴武器 ${name}：`)) return false;
+    }
+    return true;
+  };
+  return {
+    ...record,
+    targets: record.targets.filter((target) => !existing.has(targetIdentity(target))),
+    targetOutcomes: record.targetOutcomes.filter((item) => !existing.has(targetIdentity(item))),
+    targetSummary: record.targetSummary.filter(shouldKeepSummary),
+    warnings: record.warnings.filter(shouldKeepSummary),
+  };
+}
+
+function mergeTargets(originalTargets, additionalTargets) {
+  const combined = [...originalTargets];
+  const seen = new Set(combined.map(targetIdentity));
+  for (const target of additionalTargets) {
+    const identity = targetIdentity(target);
+    if (seen.has(identity)) continue;
+    seen.add(identity);
+    combined.push(target);
+  }
+  return combined;
+}
+
+function mergeProfiles(originalProfiles, additionalProfiles) {
+  const combined = [...originalProfiles];
+  const seen = new Set(combined.map((profile) => profile.characterName));
+  for (const profile of additionalProfiles) {
+    if (seen.has(profile.characterName)) continue;
+    seen.add(profile.characterName);
+    combined.push(profile);
+  }
+  return combined;
+}
+
+function targetIdentity(target) {
+  return `${target?.kind}:${target?.name}`;
+}
+
+function attachTargetContext(plan, profile, targetSummary, targetOutcomes = profile?.targetOutcomes ?? []) {
   plan.profile = profile;
   plan.targetSummary = targetSummary;
-  plan.targetOutcomes = profile?.targetOutcomes ?? [];
+  plan.targetOutcomes = targetOutcomes;
 }
 
 async function executeResinQueue(entries, settings, partySwitchState, emptyReason = null) {
@@ -956,8 +1160,14 @@ async function scanInventoryItemIds(materialIds, inventory, materials, phase, op
   let updatedInventory = inventory;
   const issueNames = new Set();
   const notFoundNames = new Set();
+  const uncertainMaterialIds = new Set();
   log.info('[背包] {phase}读取 {count} 个本次目标材料及可合成低阶材料', phase, scanCount);
   for (const [tabName, scanItems] of Object.entries(scanGroups)) {
+    const scanItemByName = new Map(scanItems.map((item) => [item.name, item]));
+    const markUncertainFamily = (name) => {
+      const item = scanItemByName.get(name);
+      if (item?.notFoundAsUnknown === true) uncertainMaterialIds.add(item.materialId);
+    };
     const param = new CountInventoryItemParam();
     param.IconRecognitionMode = ItemIconRecognitionMode.Item;
     param.GridScreenName = tabName === 'CharacterDevelopmentItems'
@@ -971,27 +1181,44 @@ async function scanInventoryItemIds(materialIds, inventory, materials, phase, op
       updatedInventory = applied.inventory;
       for (const name of applied.notFoundNames) notFoundNames.add(name);
       if (applied.failedNames.length > 0) {
-        for (const name of applied.failedNames) issueNames.add(name);
+        for (const name of applied.failedNames) {
+          issueNames.add(name);
+          markUncertainFamily(name);
+        }
         log.warn('[背包] {phase}以下材料的数量 OCR 失败，将不用于收益统计：{names}。请确认 BetterGI 已切换到 OCR V6 后重试',
           phase, applied.failedNames.join('、'));
       }
       if (applied.unrecognizedNames.length > 0) {
-        for (const name of applied.unrecognizedNames) issueNames.add(name);
+        for (const name of applied.unrecognizedNames) {
+          issueNames.add(name);
+          markUncertainFamily(name);
+        }
         log.warn('[背包] {phase}的 ItemV2 图标模型未匹配到以下材料，已保留执行前数量且不会据此判断为零收益：{names}',
           phase, applied.unrecognizedNames.join('、'));
       }
       if (applied.decreasedNames.length > 0) {
-        for (const name of applied.decreasedNames) issueNames.add(name);
+        for (const name of applied.decreasedNames) {
+          issueNames.add(name);
+          markUncertainFamily(name);
+        }
         log.warn('[背包] {phase}以下材料返回值低于执行前；本脚本不会消耗培养材料，已保留原库存：{names}',
           phase, applied.decreasedNames.join('、'));
       }
     } catch (error) {
-      for (const item of scanItems) issueNames.add(item.name);
+      for (const item of scanItems) {
+        issueNames.add(item.name);
+        if (item.notFoundAsUnknown === true) uncertainMaterialIds.add(item.materialId);
+      }
       log.error('[背包] {phase}读取“{tab}”页失败，相关材料将保留原值：{error}。请检查背包界面、BetterGI 版本；若是数量文字异常，再确认 OCR V6',
         phase, tabName, error.message ?? String(error));
     }
   }
-  return { inventory: updatedInventory, issueNames: [...issueNames], notFoundNames: [...notFoundNames] };
+  return {
+    inventory: updatedInventory,
+    issueNames: [...issueNames],
+    notFoundNames: [...notFoundNames],
+    uncertainMaterialIds: [...uncertainMaterialIds],
+  };
 }
 
 try {

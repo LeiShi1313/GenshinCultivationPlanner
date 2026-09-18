@@ -19,15 +19,18 @@ export function expandTargets(targets, rulebook) {
 function expandCharacterTarget(target, characters) {
   const character = characters[target.name];
   if (!character) throw new Error(`规则库中没有角色：${target.name}`);
-  validateLevels(target.level?.current, target.level?.target, `角色 ${target.name} 等级`);
   const costs = [];
-  appendAscensionCosts(costs, character.ascensionCosts, target.level);
+  if (target.level != null) {
+    validateLevels(target.level.current, target.level.target, `角色 ${target.name} 等级`);
+    appendAscensionCosts(costs, character.ascensionCosts, target.level);
+  }
   for (const talentName of ['normal', 'skill', 'burst']) {
     const talent = target.talents?.[talentName];
     if (!talent) continue;
     validateTalentLevels(talent.current, talent.target, `角色 ${target.name} 的${talentName}天赋`);
     appendTalentCosts(costs, character.talentCosts, talent.current, talent.target);
   }
+  if (target.level == null && costs.length === 0) throw new Error(`角色 ${target.name} 没有可计算的培养项目`);
   return { id: target.id ?? `character:${target.name}`, requirements: mergeCostItems(costs) };
 }
 

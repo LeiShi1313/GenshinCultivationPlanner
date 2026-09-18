@@ -22,6 +22,12 @@ const weaponMetadata = new Map(db.weapons('names', {
   matchCategories: true,
   verboseCategories: true,
 }).map((item) => [item.name, item]));
+for (const [name, rule] of Object.entries(rulebook.characters)) {
+  if (!characterMetadata.has(name) && rule.elementText) characterMetadata.set(name, rule);
+}
+for (const [name, rule] of Object.entries(rulebook.weapons)) {
+  if (!weaponMetadata.has(name) && rule.weaponText) weaponMetadata.set(name, rule);
+}
 
 const characterOptions = buildCascadeOptions({
   names: Object.keys(rulebook.characters),

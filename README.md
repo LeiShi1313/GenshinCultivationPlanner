@@ -68,6 +68,36 @@
 
 “预览目标”仅用于排查：它会保存识别结果，但不读取背包、不刷取材料，也不发送运行摘要；首次使用不需要先预览。
 
+### 持久预刷计划
+
+需要同时保留多个培养目标，或为尚未拥有的角色预刷时，可在“附加培养计划文件”填写 JSON 文件路径；留空时行为与原来完全相同。附加目标与设置页目标共用同一套材料规划和执行流程，名称重复时以设置页读取到的目标为准。完整示例见 [`data/user-targets.example.json`](data/user-targets.example.json)：
+
+```json
+{
+  "targets": [
+    {
+      "kind": "character",
+      "name": "薇斯纳",
+      "allowUnowned": true,
+      "level": { "target": 81 },
+      "talents": {
+        "normal": { "target": 10 },
+        "skill": { "target": 6 },
+        "burst": { "target": 10 }
+      },
+      "weapon": { "name": "蝶变", "level": { "target": 90 } }
+    }
+  ],
+  "inventory": {}
+}
+```
+
+`current`、`currentLimit` 和天赋的 `current` 可省略，分别按初始 `1/20`、天赋 `1/1/1` 计算；`targetLimit` 也可显式填写，未填写时 `80` 表示 `80/90`。一旦读取到同名真实档案，当前角色等级、突破上限、天赋和所佩戴武器都会以档案为准，文件中的目标等级不变；天赋命座 `+3` 会还原后再计算。独立的 `kind: "weapon"` 目标始终按文件中的武器计算。
+
+`allowUnowned: true` 只在首次遇到精确的同名 UI 未找到提示，或 BetterGI 的同名角色元数据校验失败时启用初始值；这只是“档案未确认”的预刷假设，不证明账号未拥有角色。真实档案一旦出现便会永久记录；以后读取失败会停止该角色目标，不会退回 `1/20`。文件写入或回读失败同样会停止执行。背包没有返回某个新增材料时，该材料保持“未知”而不是按零个计算，并只暂停受影响的合成链。
+
+预发行角色、武器及材料已直接写入标准 `rulebook.json`、`materials.json`、`crafting-recipes.json` 和 `source-candidates.json`，并保留 Nanoka `7.0.54 BETA` 来源说明；计划文件不承载另一套规则库。目前已核对的“荒坠的圣迹”和“妄念的创痕”系列可以自动安排秘境；尚未被 BetterGI 支持的未来世界 Boss 保持手动待办。BetterGI 没有公开 Boss 能力列表，因此仅更新 BetterGI 还不会自动启用这些未来 Boss，本版本也不会用无效执行参数探测。
+
 ## 自动匹配与任务执行
 
 世界 Boss 会根据缺少的突破材料自动匹配，用户不需要输入 Boss 名称。通常填写通用 Boss 队伍即可；机制特殊的 Boss 可以使用专属配置，例如：
