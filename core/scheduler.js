@@ -2,6 +2,44 @@ const STATUS_SUPPORTED = 'supported';
 const STATUS_WAITING_OPEN = 'waiting_open';
 
 /**
+ * Apply confirmed openings to this run only. Callers validate live observations;
+ * each override identifies one domain/reward family and carries its evidence.
+ * Empty observations preserve the static calendar; they never imply closure.
+ */
+export function applyDomainOpeningOverrides({ materials, overrides = [], today }) {
+  if (!Number.isInteger(today) || today < 0 || today > 6) {
+    throw new Error('星期必须为 0 到 6 的整数');
+  }
+  let runMaterials = materials;
+  const openings = [];
+  for (const override of overrides) {
+    if (typeof override?.domainName !== 'string' || !override.domainName
+      || !['1', '2', '3'].includes(String(override.sundaySelectedValue))) continue;
+    const reward = String(override.sundaySelectedValue);
+    const materialIds = Object.keys(runMaterials).filter((id) => {
+      const material = runMaterials[id];
+      return material.status === STATUS_SUPPORTED && material.executionType === 'domain'
+        && material.domainName === override.domainName
+        && String(material.sundaySelectedValue) === reward
+        && Array.isArray(material.openDays) && !material.openDays.includes(today);
+    });
+    if (materialIds.length === 0) continue;
+    if (runMaterials === materials) runMaterials = { ...materials };
+    for (const id of materialIds) {
+      runMaterials[id] = { ...runMaterials[id], openDays: [...runMaterials[id].openDays, today] };
+    }
+    openings.push({
+      domainName: override.domainName,
+      sundaySelectedValue: reward,
+      materialIds,
+      materialNames: materialIds.map((id) => materials[id].name),
+      evidence: override.evidence,
+    });
+  }
+  return { materials: runMaterials, openings };
+}
+
+/**
  * 生成七天计划和当天队列。输入中的 shortage 必须来自 calculateShortages。
  *
  * @param {Array<object>} shortages

@@ -29,7 +29,8 @@ import {
   validateBossOverrideNames,
 } from './core/settings.js';
 import { readTrainingGuideSnapshot } from './guide-reader/index.js';
-import { appendGuideTargetData, applyGuideLimitedOpenings, buildGuideTargetData } from './core/guide-targets.js';
+import { appendGuideTargetData, buildGuideTargetData, resolveGuideDomainOpenings } from './core/guide-targets.js';
+import { applyDomainOpeningOverrides } from './core/scheduler.js';
 import {
   createExecutionOutcome,
   createRunExecution,
@@ -267,12 +268,13 @@ async function main() {
     serverOffsetMs: ServerTime.GetServerTimeZoneOffset(),
   });
   const limitedOpenings = scriptSettings.useServerWeekday !== false
-    ? applyGuideLimitedOpenings({ materials, sourceCandidates, rulebook, guideTargetData, today })
+    ? applyDomainOpeningOverrides({ materials, today,
+      overrides: resolveGuideDomainOpenings({ materials, sourceCandidates, guideTargetData }) })
     : { materials, openings: [] };
   materials = limitedOpenings.materials;
   for (const opening of limitedOpenings.openings) {
-    log.info('[提升指南] 限时开放：{source} → {domain}（奖励序号 {reward}）；材料={materials}；仅本次计划日 {day}',
-      opening.gameDomainName, opening.domainName, opening.sundaySelectedValue, opening.materialNames.join('、'), today);
+    log.info('[调度] 限时开放：{domain}（奖励序号 {reward}）；材料={materials}；仅本次计划日 {day}；依据={evidence}',
+      opening.domainName, opening.sundaySelectedValue, opening.materialNames.join('、'), today, JSON.stringify(opening.evidence));
   }
   log.info('[初始化] 目标数量：{count}；计划日：{day}（{source}）', (targetData.targets ?? []).length, today,
     scriptSettings.useServerWeekday !== false ? '服务器时间 04:00 刷新规则' : '手动指定');
@@ -360,6 +362,7 @@ async function main() {
     log.info('[背包] 已关闭自动读取，库存仅使用目标文件中的 inventory 字段');
   }
 
+  plan.domainOpenings = limitedOpenings.openings;
   if (allTargetsSatisfied) {
     plan.routes = { matched: [], missing: [] };
   } else if (scriptSettings.discoverRoutes !== false) {

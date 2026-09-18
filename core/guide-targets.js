@@ -1,5 +1,4 @@
 import { buildAutomaticProfileTargets, buildTargetSummary, readCharacterProfile } from './character-profile.js';
-import { expandTargets } from './requirements.js';
 
 const MAX_GUIDE_AGE_MS = 5 * 60 * 1000;
 const TALENT_SLOT_KEYS = Object.freeze({
@@ -87,32 +86,17 @@ export async function buildGuideTargetData({
   };
 }
 
-/** Apply fresh, exact Training Guide limited-opening evidence to this run's material catalog only. */
-export function applyGuideLimitedOpenings({ materials, sourceCandidates, rulebook, guideTargetData, today }) {
-  if (!materials || !sourceCandidates || !rulebook || !guideTargetData || !Number.isInteger(today)) {
-    return { materials, openings: [] };
-  }
-  const guide = guideTargetData.guide;
-  const requests = Array.isArray(guide?.targetRequests) ? guide.targetRequests : [];
+/** Resolve validated Guide observations to domain/reward identities, without scheduling. */
+export function resolveGuideDomainOpenings({ materials, sourceCandidates, guideTargetData }) {
+  const guide = guideTargetData?.guide;
   const sources = Array.isArray(guide?.limitedOpenSources) ? guide.limitedOpenSources : [];
-  const targets = Array.isArray(guideTargetData.targets) ? guideTargetData.targets : [];
-  let runMaterials = materials;
   const openings = [];
 
   for (const source of sources) {
-    const request = requests.find((item) => item.characterName === source.characterName);
-    const matchingTargets = source.page === '角色天赋'
-      ? targets.filter((target) => target.kind === 'character' && target.name === source.characterName)
-      : source.page === '武器' && request
-        ? targets.filter((target) => target.kind === 'weapon' && target.name === request.weapon.name)
-        : [];
-    if (matchingTargets.length === 0) continue;
-    const requiredIds = new Set(expandTargets(matchingTargets, rulebook)
-      .flatMap((target) => target.requirements ?? []).map((item) => String(item.materialId)));
-    const candidates = [...requiredIds].filter((materialId) => {
+    const candidates = Object.keys(materials).filter((materialId) => {
       const material = materials[materialId];
       const candidate = sourceCandidates[materialId];
-      return material?.executionType === 'domain' && material.limited === true
+      return material?.executionType === 'domain'
         && candidate?.type === 'domain'
         && normalizeSourceText(candidate.gameDomainName) === source.gameDomainName;
     });
@@ -124,28 +108,23 @@ export function applyGuideLimitedOpenings({ materials, sourceCandidates, ruleboo
       families.get(key).push(materialId);
     }
     if (families.size !== 1) continue;
-    const materialIds = [...families.values()][0];
-    const first = materials[materialIds[0]];
+    const first = materials[[...families.values()][0][0]];
     if (!first?.domainName || !['1', '2', '3'].includes(String(first.sundaySelectedValue))) continue;
-    const newlyOpenIds = materialIds.filter((materialId) => !(materials[materialId].openDays ?? []).includes(today));
-    if (newlyOpenIds.length === 0) continue;
-    if (runMaterials === materials) runMaterials = { ...materials };
-    for (const materialId of newlyOpenIds) {
-      const material = materials[materialId];
-      runMaterials[materialId] = { ...material, openDays: [...(material.openDays ?? []), today] };
-    }
     openings.push({
-      characterName: source.characterName,
-      page: source.page,
-      gameDomainName: source.gameDomainName,
       domainName: first.domainName,
       sundaySelectedValue: String(first.sundaySelectedValue),
-      materialIds: newlyOpenIds,
-      materialNames: newlyOpenIds.map((materialId) => materials[materialId].name),
-      evidence: source.evidence,
+      evidence: {
+        source: 'training-guide',
+        runId: guide.runId,
+        capturedAt: guide.capturedAt,
+        characterName: source.characterName,
+        page: source.page,
+        gameDomainName: source.gameDomainName,
+        ...source.evidence,
+      },
     });
   }
-  return { materials: runMaterials, openings };
+  return openings;
 }
 
 /** Append non-duplicate guide targets without changing original targets or inventory. */
