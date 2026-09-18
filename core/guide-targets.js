@@ -15,6 +15,7 @@ export async function buildGuideTargetData({
   rulebook,
   service,
   profilesByCharacter = {},
+  onProfile = null,
   nowMs = Date.now(),
 }) {
   const { collection, preview } = requireFreshGuideSnapshot(snapshot, nowMs);
@@ -34,6 +35,8 @@ export async function buildGuideTargetData({
     if (profile?.characterName !== request.characterName) {
       throw new Error(`角色档案返回“${profile?.characterName ?? '未知角色'}”，与提升指南“${request.characterName}”不一致`);
     }
+    // A genuine profile remains observed even if later guide validation rejects its goals.
+    await onProfile?.(profile);
     const settings = buildProfileSettings(request, profile);
     const guideLevelCompleted = request.level.noUpgradeNeeded === true
       && request.level.current >= 90 && request.level.current <= 100 && request.level.target === 90;

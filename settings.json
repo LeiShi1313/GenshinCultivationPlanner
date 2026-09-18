@@ -21,6 +21,12 @@
     "default": "读取档案并执行"
   },
   {
+    "name": "allowUnowned",
+    "type": "checkbox",
+    "label": "允许预刷（未拥有角色按1级、天赋1/1/1；拥有后自动读取）",
+    "default": false
+  },
+  {
     "name": "autoWeaponMode",
     "type": "select",
     "label": "培养内容",

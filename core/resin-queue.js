@@ -16,8 +16,16 @@ export function compileResinExecutionQueue({ plan, settings, policy, domainResin
   ));
   if (policy.mode === 'legacy') {
     const task = candidates[0];
+    const entry = task ? compileEntry(task, policy, settings, domainResinPolicy) : null;
+    if (entry && settings.allowUnowned === true) {
+      return {
+        entries: [{ ...entry, unsupportedFallbacks: candidates.slice(1)
+          .map((candidate) => compileEntry(candidate, policy, settings, domainResinPolicy)) }],
+        omitted: [],
+      };
+    }
     return {
-      entries: task ? [compileEntry(task, policy, settings, domainResinPolicy)] : [],
+      entries: entry ? [entry] : [],
       omitted: [],
     };
   }
@@ -27,13 +35,20 @@ export function compileResinExecutionQueue({ plan, settings, policy, domainResin
   for (const category of policy.taskOrder) {
     const categoryTasks = candidates.filter((task) => getTaskPolicyType(task) === category);
     if (categoryTasks.length === 0) continue;
-    entries.push(compileEntry(categoryTasks[0], policy, settings, domainResinPolicy));
+    const entry = compileEntry(categoryTasks[0], policy, settings, domainResinPolicy);
+    entries.push(settings.allowUnowned === true ? {
+      ...entry,
+      unsupportedFallbacks: categoryTasks.slice(1)
+        .map((task) => compileEntry(task, policy, settings, domainResinPolicy)),
+    } : entry);
     for (const task of categoryTasks.slice(1)) {
       omitted.push({
         task,
         category,
         code: 'same_category_deferred',
-        reason: '同一类别存在多个目标；当前版本只执行排序最前的一项，不在多个同类秘境之间分配树脂',
+        reason: settings.allowUnowned === true
+          ? '同一类别只执行首个可用目标；仅在原生接口明确拒绝、尚未消耗树脂时替补'
+          : '同一类别存在多个目标；当前版本只执行排序最前的一项，不在多个同类秘境之间分配树脂',
       });
     }
   }
@@ -46,6 +61,7 @@ export function compileResinExecutionQueue({ plan, settings, policy, domainResin
 /** 没有可靠剩余树脂证据时，用任务结果决定是否继续下一项。 */
 export function shouldStopResinQueue(execution, entry = null) {
   if (!execution) return true;
+  if (execution.status === 'skipped' && execution.code === 'native_unsupported') return false;
   if (execution.status === 'failed' || execution.status === 'unconfirmed') return true;
   if (execution.code === 'no_resin') return true;
   // “用完可用树脂”表示把剩余预算交给当前任务；后续任务没有可靠的剩余树脂证据，不再探测调用。
@@ -56,9 +72,15 @@ export function shouldStopResinQueue(execution, entry = null) {
 export async function runBoundedResinQueue(entries, executeEntry) {
   const results = [];
   for (const [index, entry] of entries.entries()) {
-    const result = await executeEntry(entry, index);
-    results.push(result);
-    if (shouldStopResinQueue(result, entry)) break;
+    let result;
+    let attempted = entry;
+    for (const candidate of [entry, ...(entry.unsupportedFallbacks ?? [])]) {
+      attempted = candidate;
+      result = await executeEntry(candidate, index);
+      results.push(result);
+      if (result?.status !== 'skipped' || result.code !== 'native_unsupported') break;
+    }
+    if (shouldStopResinQueue(result, attempted)) break;
   }
   return results;
 }

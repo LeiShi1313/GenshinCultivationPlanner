@@ -14,6 +14,9 @@ const BOSS_OVERRIDE_ACTIONS = new Set(['继承通用配置', '启用', '禁用']
 /** 将紧凑设置页的模式值转换为现有执行器使用的兼容字段。 */
 export function normalizeScriptSettings(rawSettings = {}) {
   const normalized = { ...rawSettings };
+  if (rawSettings.allowUnowned != null && typeof rawSettings.allowUnowned !== 'boolean') {
+    throw new Error('允许预刷必须是布尔值');
+  }
 
   applyTargetSelections(normalized, rawSettings);
   applyRouteModes(normalized, rawSettings);
@@ -137,8 +140,15 @@ function applyLegacyBossOverrideSlots(settings, rawSettings) {
 }
 
 /** 自由文本仍需校验名称，避免拼写错误导致专属配置静默失效。 */
-export function validateBossOverrideNames(settings = {}, catalog = {}) {
+export function validateBossOverrideNames(settings = {}, catalog = {}, materials = {}) {
   const knownBosses = new Set(catalog.bosses ?? []);
+  if (settings.allowUnowned === true) {
+    for (const material of Object.values(materials)) {
+      if (material.executionType === 'boss' && typeof material.bossName === 'string' && material.bossName.trim()) {
+        knownBosses.add(material.bossName);
+      }
+    }
+  }
   for (const bossName of Object.keys(settings.bossOverrides ?? {})) {
     if (!knownBosses.has(bossName)) {
       throw new Error(`Boss 专属配置中的“${bossName}”不是当前 BetterGI 支持的世界 Boss 名称`);
