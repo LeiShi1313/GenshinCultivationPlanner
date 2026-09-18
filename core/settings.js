@@ -17,9 +17,6 @@ export function normalizeScriptSettings(rawSettings = {}) {
   if (rawSettings.allowUnowned != null && typeof rawSettings.allowUnowned !== 'boolean') {
     throw new Error('允许预刷必须是布尔值');
   }
-  if (rawSettings.additionalTargetsFile) {
-    throw new Error('附加培养计划文件入口已移除；请使用原有角色/武器设置并勾选“允许预刷”');
-  }
 
   applyTargetSelections(normalized, rawSettings);
   applyRouteModes(normalized, rawSettings);
