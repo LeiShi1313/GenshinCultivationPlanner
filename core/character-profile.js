@@ -16,7 +16,7 @@ const NO_WEAPON_SELECTION = '不选择武器';
 const NO_TALENT_TARGET = '不培养';
 const LEVEL_LIMITS = new Set([20, 40, 50, 60, 70, 80, 90]);
 const TARGET_LIMITS = new Map([
-  [20, 40], [40, 50], [50, 60], [60, 70], [70, 80], [80, 90], [81, 90], [90, 90],
+  [20, 40], [40, 50], [50, 60], [60, 70], [70, 80], [80, 90], [90, 90],
 ]);
 
 export function isAutomaticProfileMode(settings = {}) {
@@ -374,7 +374,7 @@ function resolveCultivationMode(value) {
 }
 
 function parseTargetLevel(value, label) {
-  const match = String(value ?? '').trim().match(/^(20|40|50|60|70|80|81|90)(?:\D|$)/);
+  const match = String(value ?? '').trim().match(/^(20|40|50|60|70|80|90)(?:\D|$)/);
   if (!match) throw new Error(`${label}无效：“${value ?? ''}”`);
   return Number(match[1]);
 }
