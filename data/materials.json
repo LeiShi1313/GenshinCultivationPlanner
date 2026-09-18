@@ -1490,8 +1490,7 @@
       5,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "104369": {
     "name": "「坚忍」的指引",
@@ -1505,8 +1504,7 @@
       5,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "104370": {
     "name": "「坚忍」的哲学",
@@ -1520,8 +1518,7 @@
       5,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "104371": {
     "name": "「荣光」的教导",
@@ -1535,8 +1532,7 @@
       6,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "104372": {
     "name": "「荣光」的指引",
@@ -1550,8 +1546,7 @@
       6,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "104373": {
     "name": "「荣光」的哲学",
@@ -1565,8 +1560,7 @@
       6,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "112002": {
     "name": "史莱姆凝液",
@@ -3934,9 +3928,9 @@
   },
   "113090": {
     "name": "焰中不灭花枝",
-    "status": "manual",
+    "status": "supported",
     "executionType": "boss",
-    "reason": "材料数据已核对；尚未配置并验证 BetterGI 原生执行适配",
+    "reason": "材料与首领名称已映射；允许预刷时原生接口明确不支持仅跳过本轮",
     "bossName": "不灭衍生造物",
     "openDays": [
       0,
@@ -3947,15 +3941,13 @@
       5,
       6
     ],
-    "limited": false,
-    "nativeSupport": "probe"
+    "limited": false
   },
   "113092": {
     "name": "游离者的裂甲",
-    "status": "manual",
-    "inventoryStatus": "unconfirmed",
+    "status": "supported",
     "executionType": "boss",
-    "reason": "材料数据已核对；尚未配置并验证 BetterGI 原生执行适配",
+    "reason": "材料与首领名称已映射；允许预刷时原生接口明确不支持仅跳过本轮",
     "bossName": "游雪的护刃",
     "openDays": [
       0,
@@ -3966,8 +3958,7 @@
       5,
       6
     ],
-    "limited": false,
-    "nativeSupport": "probe"
+    "limited": false
   },
   "114001": {
     "name": "高塔孤王的破瓦",
@@ -5241,8 +5232,7 @@
       4,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114086": {
     "name": "苍星军势的集结",
@@ -5256,8 +5246,7 @@
       4,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114087": {
     "name": "苍星军势的鸣令",
@@ -5271,8 +5260,7 @@
       4,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114088": {
     "name": "苍星军势的征服",
@@ -5286,8 +5274,7 @@
       4,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114089": {
     "name": "藏窖灵浆的斟酌",
@@ -5301,8 +5288,7 @@
       5,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114090": {
     "name": "藏窖灵浆的酩酊",
@@ -5316,8 +5302,7 @@
       5,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114091": {
     "name": "藏窖灵浆的酣畅",
@@ -5331,8 +5316,7 @@
       5,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114092": {
     "name": "藏窖灵浆的恣意",
@@ -5346,8 +5330,7 @@
       5,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114093": {
     "name": "凛雪帝皇的复生",
@@ -5361,8 +5344,7 @@
       6,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114094": {
     "name": "凛雪帝皇的庆仪",
@@ -5376,8 +5358,7 @@
       6,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114095": {
     "name": "凛雪帝皇的悲恤",
@@ -5391,8 +5372,7 @@
       6,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   },
   "114096": {
     "name": "凛雪帝皇的辞决",
@@ -5406,7 +5386,6 @@
       6,
       0
     ],
-    "limited": true,
-    "nativeSupport": "verified"
+    "limited": true
   }
 }

@@ -21,11 +21,7 @@ export function buildInventoryScanGroups(materialIds, materials) {
     const material = materials[materialId];
     if (!material || material.status === 'excluded') continue;
     const tab = getInventoryTab(materialId);
-    groups[tab].push({
-      materialId: String(materialId),
-      name: material.name,
-      ...(material.inventoryStatus === 'unconfirmed' ? { notFoundAsUnknown: true } : {}),
-    });
+    groups[tab].push({ materialId: String(materialId), name: material.name });
   }
 
   return Object.fromEntries(Object.entries(groups).filter(([, items]) => items.length > 0));
@@ -53,7 +49,7 @@ export function applyInventoryScanResult(inventory, scanItems, counts, options =
     }
     if (count === undefined || count === -1) {
       notFoundNames.push(name);
-      if (options.notFoundAsUnknown === true || item.notFoundAsUnknown === true) {
+      if (options.notFoundAsUnknown === true) {
         unrecognizedNames.push(name);
         continue;
       }

@@ -21,10 +21,10 @@
     "default": "读取档案并执行"
   },
   {
-    "name": "additionalTargetsFile",
-    "type": "input-text",
-    "label": "附加培养计划文件（可选；支持未拥有角色）",
-    "default": ""
+    "name": "allowUnowned",
+    "type": "checkbox",
+    "label": "允许预刷（未拥有角色按1级、天赋1/1/1；拥有后自动读取）",
+    "default": false
   },
   {
     "name": "autoWeaponMode",
@@ -201,6 +201,7 @@
       "60级（已突破，等级上限70）",
       "70级（已突破，等级上限80）",
       "80级（已突破，等级上限90）",
+      "81级",
       "90级"
     ],
     "default": "90级"

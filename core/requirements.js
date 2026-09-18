@@ -54,14 +54,14 @@ function appendAscensionCosts(output, costs, progress) {
     const targetIncludesAscension = level < targetLevel
       || (level === targetLevel && targetAscended);
     if (level >= currentLevel && !currentAlreadyAscended && targetIncludesAscension) {
-      output.push(...(costs[`ascend${index + 1}`] ?? []));
+      output.push(...requireCostStage(costs, `ascend${index + 1}`));
     }
   });
 }
 
 function appendTalentCosts(output, costs, currentLevel, targetLevel) {
   TALENT_LEVELS.forEach((level) => {
-    if (level > currentLevel && level <= targetLevel) output.push(...(costs[`lvl${level}`] ?? []));
+    if (level > currentLevel && level <= targetLevel) output.push(...requireCostStage(costs, `lvl${level}`));
   });
 }
 
@@ -69,6 +69,14 @@ function mergeCostItems(costs) {
   const totals = new Map();
   for (const cost of costs) totals.set(String(cost.id), (totals.get(String(cost.id)) ?? 0) + cost.count);
   return [...totals.entries()].map(([materialId, count]) => ({ materialId, count }));
+}
+
+function requireCostStage(costs, stage) {
+  const items = costs?.[stage];
+  if (!Array.isArray(items) || items.length === 0 || items.some((item) => (
+    !/^\d+$/.test(String(item?.id)) || !Number.isSafeInteger(item?.count) || item.count <= 0
+  ))) throw new Error(`材料映射缺少有效的 ${stage} 阶段成本，不能按零需求计算`);
+  return items;
 }
 
 function validateLevels(current, target, label) {
