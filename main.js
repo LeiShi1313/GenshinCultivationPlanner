@@ -313,7 +313,7 @@ async function main() {
       ...initialInventoryScan.issueNames,
       ...initialInventoryScan.notFoundNames,
     ])];
-    historicalInventoryConflicts = scriptSettings.allowUnowned === true ? [] : findHistoricalInventoryConflicts(
+    historicalInventoryConflicts = findHistoricalInventoryConflicts(
       history,
       initialInventoryScan.notFoundNames,
       materials,
