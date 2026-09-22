@@ -25,6 +25,10 @@ export function buildDomainResinPolicy(settings) {
     specifyResinUse: true,
     priority,
     originalResinUseCount: enabled.original ? UNLIMITED_USE_COUNT : 0,
+    // BetterGI 0.64 also inherits separate 20/40-resin counters from its global config.
+    // This script uses the generic counter in normal mode, so always clear both split counters.
+    originalResin20UseCount: 0,
+    originalResin40UseCount: 0,
     condensedResinUseCount: enabled.condensed ? UNLIMITED_USE_COUNT : 0,
     transientResinUseCount: enabled.transient ? UNLIMITED_USE_COUNT : 0,
     fragileResinUseCount: enabled.fragile ? UNLIMITED_USE_COUNT : 0,
@@ -45,6 +49,8 @@ export function applyDomainResinPolicyToParam(param, policy) {
   param.ResinPriorityList.Clear();
   for (const name of policy.priority) param.ResinPriorityList.Add(name);
   param.OriginalResinUseCount = policy.originalResinUseCount;
+  param.OriginalResin20UseCount = policy.originalResin20UseCount ?? 0;
+  param.OriginalResin40UseCount = policy.originalResin40UseCount ?? 0;
   param.CondensedResinUseCount = policy.condensedResinUseCount;
   param.TransientResinUseCount = policy.transientResinUseCount;
   param.FragileResinUseCount = policy.fragileResinUseCount;

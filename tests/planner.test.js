@@ -4,7 +4,14 @@ import { readFileSync } from 'node:fs';
 import { createPlan } from '../core/planner.js';
 import { applyInventoryScanResult, buildInventoryScanGroups, getInventoryTab, invalidateCraftingFamilies } from '../core/inventory.js';
 import { applyMatchedRouteSupport, discoverAutoPathingRoutes } from '../core/routes.js';
-import { buildFailureRunSummary, buildRunSummary } from '../core/report.js';
+import {
+  buildFailureRunSummary,
+  buildPlanReadySummary,
+  buildRunStartSummary,
+  buildRunSummary,
+  limitNotificationMessage,
+  shouldSendRunNotifications,
+} from '../core/report.js';
 import { collectExecutionWarningOutcomes, collectExecutionWarnings } from '../core/preflight.js';
 import { applyDomainResinPolicyToParam, buildDomainResinPolicy } from '../core/resin.js';
 import { buildDomainExecutionConfig } from '../core/domain-executor.js';
@@ -33,6 +40,8 @@ test('所有树脂任务默认启用 BetterGI 奖励识别', () => {
 test('BetterGI 0.64 自动秘境参数显式采用脚本配置的树脂优先级', () => {
   const values = [];
   const param = {
+    OriginalResin20UseCount: 7,
+    OriginalResin40UseCount: 8,
     ResinPriorityList: {
       Clear() { values.length = 0; },
       Add(value) { values.push(value); },
@@ -50,6 +59,8 @@ test('BetterGI 0.64 自动秘境参数显式采用脚本配置的树脂优先级
   assert.deepEqual(values, ['原粹树脂', '须臾树脂']);
   assert.equal(param.SpecifyResinUse, true);
   assert.equal(param.OriginalResinUseCount, 2);
+  assert.equal(param.OriginalResin20UseCount, 0);
+  assert.equal(param.OriginalResin40UseCount, 0);
   assert.equal(param.TransientResinUseCount, 1);
   assert.throws(() => applyDomainResinPolicyToParam({}, policy), /BetterGI 0\.64\.0/);
 });
@@ -365,7 +376,8 @@ test('精简设置页的级联默认值有效且不再暴露旧开关', () => {
     'bossOverride2Name', 'bossOverride2Action', 'bossOverride2TeamName', 'bossOverride2StrategyName',
     'bossOverride3Name', 'bossOverride3Action', 'bossOverride3TeamName', 'bossOverride3StrategyName',
   ]);
-  assert.equal(editableItems.length, 35);
+  assert.equal(editableItems.length, 37);
+  assert.equal(items.find((item) => item.name === 'allowUnowned')?.default, false);
   assert.equal(editableItems.some((item) => legacyNames.has(item.name)), false);
   for (const item of items.filter((candidate) => candidate.type === 'cascade-select')) {
     const values = Object.values(item.cascadeOptions).flat();
@@ -423,6 +435,8 @@ test('精简设置页的级联默认值有效且不再暴露旧开关', () => {
   assert.equal(items.find((item) => item.name === 'bossOverridesEnabled').default, false);
   assert.equal(bossCatalog.bosses.length, 41);
   assert.equal(names.at(-1), 'sendRunSummary');
+  assert.equal(items.find((item) => item.name === 'sendRunSummary').default, false);
+  assert.equal(items.find((item) => item.name === 'sendRunSummary').label, '发送关键进度与运行摘要');
   const sectionLabels = {
     domainSection: '培养材料秘境',
     gatheringRouteSection: '地方特产路线',
@@ -460,6 +474,46 @@ test('初始化异常摘要保持简短并包含失败阶段', () => {
   assert.match(summary, /角色一键养成运行失败/);
   assert.match(summary, /读取培养目标/);
   assert.match(summary, /等级格式错误/);
+  assert.ok(summary.length <= 500);
+});
+
+test('进度通知使用纯文本并明确区分计划与执行结果', () => {
+  assert.equal(buildRunStartSummary(), '角色一键养成已开始\n正在读取培养目标并生成执行计划。');
+  assert.equal(shouldSendRunNotifications({ sendRunSummary: false, targetInputMode: '自动档案识别后执行' }), false);
+  assert.equal(shouldSendRunNotifications({ sendRunSummary: true, targetInputMode: '自动档案仅预览' }), false);
+  assert.equal(shouldSendRunNotifications({ sendRunSummary: true, targetInputMode: '自动档案识别后执行' }), true);
+  assert.equal(limitNotificationMessage('已完成'), '已完成');
+  assert.equal(limitNotificationMessage(`${'任'.repeat(500)}🙂`).length, 500);
+  assert.match(limitNotificationMessage(`${'任'.repeat(500)}🙂`), /…$/);
+
+  const summary = buildPlanReadySummary({
+    targetCount: 6,
+    targetSummary: [
+      '角色 桑多涅：90/90 → 90/90',
+      '天赋：爆发8→10',
+      '角色 奥黛塔：90/90 → 90/90',
+      '天赋：普攻1→6，战技9→10，爆发1→9',
+      `补充目标：${'很长'.repeat(300)}`,
+    ],
+    queue: [
+      { targetName: '荒坠的圣迹', maxClaims: 1 },
+      { targetName: '逆悬的冰河', maxClaims: null },
+      { targetName: '第三项', maxClaims: 2 },
+      { targetName: '第四项', maxClaims: 3 },
+      { targetName: '不应展开的第五项', maxClaims: 4 },
+    ],
+  });
+  assert.match(summary, /^角色一键养成计划已就绪\n/);
+  assert.match(summary, /培养目标：6 项/);
+  assert.match(summary, /培养计划\n• 角色 桑多涅：90\/90 → 90\/90/);
+  assert.match(summary, /天赋：爆发8→10/);
+  assert.match(summary, /计划树脂任务：5 项/);
+  assert.match(summary, /荒坠的圣迹（计划最多领奖1次）/);
+  assert.match(summary, /逆悬的冰河（计划使用可用预算）/);
+  assert.doesNotMatch(summary, /不应展开的第五项/);
+  assert.match(summary, /以上仅为计划/);
+  assert.match(summary, /…/);
+  assert.doesNotMatch(summary, /<[^>]+>/);
   assert.ok(summary.length <= 500);
 });
 
@@ -746,7 +800,7 @@ test('运行摘要明确未执行状态、候选任务和无历史数据时的�
   assert.match(summary, /本次未执行/);
   assert.match(summary, /测试天赋书\(12\)/);
   assert.match(summary, /等待累计实际掉落数据/);
-  assert.match(summary, /<br><b>仍缺材料<\/b>/);
+  assert.match(summary, /\n\n仍缺材料\n/);
   assert.match(summary, /今日可执行任务/);
   assert.doesNotMatch(summary, /下一步候选/);
 });
@@ -791,7 +845,7 @@ test('库存未确认时邮件列出材料名称而不是误报无缺口', () =>
     estimateReason: '背包库存未确认，暂无法估算',
   });
   assert.match(summary, /狮牙斗士的镣铐（库存未确认）/);
-  assert.doesNotMatch(summary, /仍缺材料<\/b><br>• 无/);
+  assert.doesNotMatch(summary, /仍缺材料\n• 无/);
 });
 
 test('运行摘要把周本缺口明确列为手动获取', () => {
@@ -1554,7 +1608,9 @@ test('圣遗物秘境仅在当天没有培养树脂任务时作为可选填充',
   }, buildDomainResinPolicy({}));
   assert.equal(singleRunConfig.testSingleRun, true);
   assert.deepEqual(singleRunConfig.resinPolicy.priority, ['原粹树脂']);
-  assert.equal(singleRunConfig.resinPolicy.originalResinUseCount, 1);
+  assert.equal(singleRunConfig.resinPolicy.originalResinUseCount, 0);
+  assert.equal(singleRunConfig.resinPolicy.originalResin20UseCount, 1);
+  assert.equal(singleRunConfig.resinPolicy.originalResin40UseCount, 0);
 });
 
 test('秘境执行配置必须具备队伍、映射任务和允许树脂', () => {
@@ -1587,7 +1643,9 @@ test('培养秘境单次测试只允许领取一次原粹树脂奖励', () => {
   );
   assert.equal(config.testSingleRun, true);
   assert.deepEqual(config.resinPolicy.priority, ['原粹树脂']);
-  assert.equal(config.resinPolicy.originalResinUseCount, 1);
+  assert.equal(config.resinPolicy.originalResinUseCount, 0);
+  assert.equal(config.resinPolicy.originalResin20UseCount, 1);
+  assert.equal(config.resinPolicy.originalResin40UseCount, 0);
   assert.equal(config.resinPolicy.condensedResinUseCount, 0);
   assert.equal(config.resinPolicy.transientResinUseCount, 0);
   assert.equal(config.resinPolicy.fragileResinUseCount, 0);

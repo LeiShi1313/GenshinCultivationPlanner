@@ -1,7 +1,14 @@
 import { createPlan } from './core/planner.js';
 import { applyInventoryScanResult, buildInventoryScanGroups, invalidateCraftingFamilies } from './core/inventory.js';
 import { applyMatchedRouteSupport, discoverAutoPathingRoutes } from './core/routes.js';
-import { buildFailureRunSummary, buildRunSummary } from './core/report.js';
+import {
+  buildFailureRunSummary,
+  buildPlanReadySummary,
+  buildRunStartSummary,
+  buildRunSummary,
+  limitNotificationMessage,
+  shouldSendRunNotifications,
+} from './core/report.js';
 import { collectExecutionWarningOutcomes } from './core/preflight.js';
 import { applyDomainResinPolicyToParam, buildDomainResinPolicy } from './core/resin.js';
 import { compileResinPolicyV2, formatResinPolicyPreview } from './core/resin-policy-v2.js';
@@ -16,7 +23,14 @@ import { buildCompletionEstimate } from './core/estimate.js';
 import { applyFinalRouteInventoryGains, buildRouteExecutionPlan, runSubscribedRouteFile } from './core/route-executor.js';
 import { appendArtifactFallbackTask } from './core/artifact-executor.js';
 import { switchPartyWithRecovery } from './core/party-switch.js';
-import { assertExecutionConfirmed, normalizeScriptSettings, validateBossOverrideNames } from './core/settings.js';
+import {
+  assertExecutionConfirmed,
+  normalizeScriptSettings,
+  validateBossOverrideNames,
+} from './core/settings.js';
+import { readTrainingGuideSnapshot } from './guide-reader/index.js';
+import { appendGuideTargetData, buildGuideTargetData, resolveGuideDomainOpenings } from './core/guide-targets.js';
+import { applyDomainOpeningOverrides } from './core/scheduler.js';
 import {
   createExecutionOutcome,
   createRunExecution,
@@ -24,16 +38,17 @@ import {
   updatePrimaryTaskOutcome,
   updateRunOutcome,
 } from './core/execution-outcome.js';
-import { classifyExecutionError, withExecutionContext } from './core/error-classifier.js';
+import { classifyExecutionError, isUnsupportedNativeTask, withExecutionContext } from './core/error-classifier.js';
 import {
   buildAutomaticProfileTargets,
   buildTargetSummary,
   isAutomaticProfileMode,
+  isUnownedProfileError,
   prepareAutomaticProfileRequest,
   readCharacterProfile,
 } from './core/character-profile.js';
 
-const failureNotificationState = { settings: null, stage: '初始化' };
+const failureNotificationState = { enabled: false, settings: null, stage: '初始化' };
 
 async function main() {
   let scriptSettings;
@@ -47,12 +62,16 @@ async function main() {
   }
   const executionEnabled = true;
   failureNotificationState.settings = scriptSettings;
+  failureNotificationState.enabled = shouldSendRunNotifications(scriptSettings);
   log.info('[模式] 已确认配置，进入实际执行模式');
+  sendNotificationSafely(() => buildRunStartSummary(), '开始进度');
 
   failureNotificationState.stage = '读取培养目标';
-  const materials = JSON.parse(file.readTextSync('data/materials.json'));
+  let materials = JSON.parse(file.readTextSync('data/materials.json'));
   const recipes = JSON.parse(file.readTextSync('data/crafting-recipes.json'));
   const rulebook = JSON.parse(file.readTextSync('data/rulebook.json'));
+  const observedPath = 'record/prefarm-observed.json';
+  let observedCharacters = null;
   const bossCatalog = JSON.parse(file.readTextSync('data/bettergi-boss-catalog.json'));
   let history = [];
   try {
@@ -60,35 +79,59 @@ async function main() {
   } catch {
     // 首次运行没有历史文件属于正常情况。
   }
-  validateBossOverrideNames(scriptSettings, bossCatalog);
+  validateBossOverrideNames(scriptSettings, bossCatalog, materials);
   let targetData;
   let profileRecord = null;
-  if (isAutomaticProfileMode(scriptSettings)) {
+  let guideRecord = null;
+  let guideTargetData = null;
+  let originalConfigured = false;
+  let deferredProfilePreview = false;
+  let originalProfileCoversGuide = false;
+  if (isAutomaticProfileMode(scriptSettings) && isEmptyGuideOnlySelection(scriptSettings)) {
+    targetData = { targets: [], inventory: {} };
+    deferredProfilePreview = scriptSettings.targetInputMode === '自动档案仅预览';
+    log.info('[自动档案] 未选择原计划角色或武器；本次仅附加提升指南目标');
+  } else if (isAutomaticProfileMode(scriptSettings)) {
     try {
       const request = prepareAutomaticProfileRequest(scriptSettings, rulebook);
+      if (request.requiresProfile) observedCharacters = loadObservedCharacters(observedPath);
       const service = typeof characterDevelopmentTask === 'undefined' ? null : characterDevelopmentTask;
       let profile = null;
       let profileError = null;
+      let initialProgress = false;
       if (request.requiresProfile) {
         try {
           profile = await readCharacterProfile(service, request);
+          originalProfileCoversGuide = request.categories === '属性;武器;天赋';
         } catch (error) {
-          if (request.cultivationMode !== '培养角色和指定武器') throw error;
-          profileError = error;
-          log.warn('[自动档案] 角色档案读取失败；本次仍继续处理独立的指定武器目标：{message}', error?.message ?? String(error));
+          if (scriptSettings.allowUnowned === true && observedCharacters[request.characterName] !== true
+            && isUnownedProfileError(error, request.characterName)) {
+            initialProgress = true;
+            log.warn('[预刷] 角色“{name}”档案未确认，按 1/20、天赋 1/1/1 计算；以后每次仍会尝试读取真实档案', request.characterName);
+          } else {
+            if (request.cultivationMode !== '培养角色和指定武器') throw error;
+            profileError = error;
+            log.warn('[自动档案] 角色档案读取失败；本次仍继续处理独立的指定武器目标：{message}', error?.message ?? String(error));
+          }
         }
       }
-      const generated = buildAutomaticProfileTargets(profile, scriptSettings, rulebook, request, profileError);
+      if (profile && observedCharacters && observedCharacters[profile.characterName] !== true) {
+        observedCharacters[profile.characterName] = true;
+        await persistObservedCharacters(observedPath, observedCharacters);
+      }
+      const generated = buildAutomaticProfileTargets(profile, scriptSettings, rulebook, request, profileError, initialProgress);
       const failedOutcomes = generated.targetOutcomes.filter((outcome) => outcome.status === 'failed');
       if (generated.targets.length === 0 && failedOutcomes.length > 0) {
         throw new Error(`没有可继续处理的培养目标：${failedOutcomes.map((outcome) => outcome.message).join('；')}`);
       }
       targetData = { targets: generated.targets, inventory: {} };
+      originalConfigured = true;
       profileRecord = {
         mode: scriptSettings.targetInputMode,
         cultivationMode: request.cultivationMode,
         previewOnly: request.previewOnly,
         profile,
+        ...(initialProgress ? { progressSource: 'initial-prefarm' } : {}),
         targets: generated.targets,
         targetOutcomes: generated.targetOutcomes,
         targetSummary: generated.summary,
@@ -106,8 +149,11 @@ async function main() {
       }
       log.info('[自动档案] 已保存识别记录：record/latest-profile.json');
       if (request.previewOnly) {
-        log.info('[自动档案] 仅预览模式已完成；未读取背包、未执行刷取任务、未发送通知');
-        return;
+        if (scriptSettings.appendTrainingGuide !== true) {
+          log.info('[自动档案] 仅预览模式已完成；未读取背包、未执行刷取任务、未发送通知');
+          return;
+        }
+        deferredProfilePreview = true;
       }
     } catch (error) {
       const code = /未提供 characterDevelopmentTask\.GetCharacter/.test(error?.message ?? '')
@@ -118,8 +164,108 @@ async function main() {
     }
   } else {
     targetData = loadTargets(scriptSettings, rulebook);
+    originalConfigured = Array.isArray(targetData.targets) && targetData.targets.length > 0;
   }
-  const targetSummary = profileRecord?.targetSummary ?? buildTargetSummary(targetData.targets ?? []);
+  let originalTargetData = targetData;
+  let originalTargetSummary = profileRecord?.targetSummary ?? buildTargetSummary(targetData.targets ?? []);
+  let originalTargetOutcomes = profileRecord?.targetOutcomes ?? [];
+  let targetSummary = originalTargetSummary;
+  let targetOutcomes = originalTargetOutcomes;
+  if (scriptSettings.appendTrainingGuide === true) {
+    observedCharacters ??= loadObservedCharacters(observedPath);
+    try {
+      const snapshot = await readTrainingGuideSnapshot();
+      const identities = JSON.parse(file.readTextSync('guide-reader/data/guide-identities.json'));
+      const service = typeof characterDevelopmentTask === 'undefined' ? null : characterDevelopmentTask;
+      const profilesByCharacter = originalProfileCoversGuide && profileRecord?.profile?.characterName
+        ? { [profileRecord.profile.characterName]: profileRecord.profile }
+        : {};
+      const builtGuideTargetData = await buildGuideTargetData({
+        snapshot,
+        identities,
+        rulebook,
+        service,
+        profilesByCharacter,
+        onProfile: async (profile) => {
+          try {
+            if (observedCharacters[profile.characterName] !== true) {
+              observedCharacters[profile.characterName] = true;
+              await persistObservedCharacters(observedPath, observedCharacters);
+            }
+            if (profileRecord?.progressSource === 'initial-prefarm'
+              && profile.characterName === scriptSettings.selectedCharacter.trim()) {
+              const request = prepareAutomaticProfileRequest(scriptSettings, rulebook);
+              const generated = buildAutomaticProfileTargets(profile, scriptSettings, rulebook, request);
+              originalTargetData = { targets: generated.targets, inventory: {} };
+              originalTargetSummary = generated.summary;
+              originalTargetOutcomes = generated.targetOutcomes;
+              Object.assign(profileRecord, { profile, targets: generated.targets,
+                targetSummary: generated.summary, targetOutcomes: generated.targetOutcomes,
+                ignoredWeaponReason: generated.ignoredWeaponReason });
+              delete profileRecord.progressSource;
+              await file.writeText('record/latest-profile.json', JSON.stringify(profileRecord, null, 2), false);
+              if (generated.targets.length === 0 && generated.targetOutcomes.some((outcome) => outcome.status === 'failed')) {
+                throw new Error('真实档案已覆盖预刷初始值，但没有可继续处理的培养目标');
+              }
+            }
+          } catch (error) {
+            throw withExecutionContext(error, { code: 'profile_invalid', stage: 'profile' });
+          }
+        },
+      });
+      const combined = appendGuideTargetData({
+        originalTargetData,
+        guideTargetData: builtGuideTargetData,
+        originalTargetSummary,
+        originalTargetOutcomes,
+      });
+      targetData = combined.targetData;
+      targetSummary = combined.targetSummary;
+      targetOutcomes = combined.targetOutcomes;
+      guideRecord = combined.guide;
+      try {
+        await file.writeText('record/latest-guide.json', JSON.stringify({
+          guide: combined.guide,
+          profiles: builtGuideTargetData.profiles,
+          targets: targetData.targets,
+          targetSummary,
+          targetOutcomes,
+          appendedGuideTargets: combined.appendedGuideTargets,
+          skippedGuideTargets: combined.skippedGuideTargets,
+        }, null, 2), false);
+      } catch (error) {
+        throw withExecutionContext(error, { code: 'record_write_failed', stage: 'profile' });
+      }
+      guideTargetData = builtGuideTargetData;
+      for (const line of guideTargetData.targetSummary) log.info('[提升指南] {summary}', line);
+      const guideFailures = guideTargetData.targetOutcomes.filter((outcome) => outcome.status === 'failed');
+      for (const outcome of guideFailures) log.warn('[提升指南] {message}', outcome.message);
+      if (!originalConfigured && guideTargetData.guide.targetRequests.length === 0 && guideFailures.length > 0) {
+        throw new Error(`提升指南没有可用角色：${guideFailures.map((outcome) => outcome.message).join('；')}`);
+      }
+      if (combined.skippedGuideTargets.length > 0) {
+        log.info('[提升指南] 原计划优先，已跳过 {count} 个同名同类目标', combined.skippedGuideTargets.length);
+      }
+      log.info('[提升指南] 已附加 {count} 个目标并保存组合计划：record/latest-guide.json', combined.appendedGuideTargets.length);
+    } catch (error) {
+      if (['profile_invalid', 'record_write_failed'].includes(error?.code)) throw error;
+      if (!originalConfigured) {
+        log.error('[提升指南] {message}', error?.message ?? String(error));
+        throw withExecutionContext(error, { code: 'guide_invalid', stage: 'profile' });
+      }
+      // BetterGI sleep observes the native cancellation token before falling back.
+      await sleep(1);
+      targetData = originalTargetData;
+      targetSummary = originalTargetSummary;
+      targetOutcomes = originalTargetOutcomes;
+      guideRecord = null;
+      log.warn('[提升指南] 附加失败，本次继续使用原计划：{message}', error?.message ?? String(error));
+    }
+    if (deferredProfilePreview) {
+      log.info('[自动档案] 组合目标预览已完成；未读取背包、未执行刷取任务、未发送通知');
+      return;
+    }
+  }
   const sourceCandidates = JSON.parse(file.readTextSync('data/source-candidates.json'));
   const routeOverrides = JSON.parse(file.readTextSync('data/route-overrides.json'));
   const today = resolvePlanningWeekday({
@@ -128,6 +274,15 @@ async function main() {
     nowMs: Date.now(),
     serverOffsetMs: ServerTime.GetServerTimeZoneOffset(),
   });
+  const limitedOpenings = scriptSettings.useServerWeekday !== false
+    ? applyDomainOpeningOverrides({ materials, today,
+      overrides: resolveGuideDomainOpenings({ materials, sourceCandidates, guideTargetData }) })
+    : { materials, openings: [] };
+  materials = limitedOpenings.materials;
+  for (const opening of limitedOpenings.openings) {
+    log.info('[调度] 限时开放：{domain}（奖励序号 {reward}）；材料={materials}；仅本次计划日 {day}；依据={evidence}',
+      opening.domainName, opening.sundaySelectedValue, opening.materialNames.join('、'), today, JSON.stringify(opening.evidence));
+  }
   log.info('[初始化] 目标数量：{count}；计划日：{day}（{source}）', (targetData.targets ?? []).length, today,
     scriptSettings.useServerWeekday !== false ? '服务器时间 04:00 刷新规则' : '手动指定');
   for (const target of targetData.targets ?? []) {
@@ -144,7 +299,12 @@ async function main() {
   let inventoryBeforeIssueNames = [];
   let inventoryBeforeNotFoundNames = [];
   let historicalInventoryConflicts = [];
-  const runWarnings = [];
+  const runWarnings = targetOutcomes.filter((outcome) => outcome.component === 'guide' && outcome.status === 'failed')
+    .map((outcome) => createExecutionOutcome({
+      taskId: `guide:${outcome.name}`, taskType: 'guide', targetName: outcome.name,
+      status: 'skipped', code: 'guide_character_invalid', stage: 'profile', severity: 'warning',
+      message: outcome.message,
+    }));
   let plan = createPlan({
     targets: targetData.targets ?? [],
     inventory,
@@ -153,7 +313,7 @@ async function main() {
     rulebook,
     today,
   });
-  attachTargetContext(plan, profileRecord, targetSummary);
+  attachTargetContext(plan, profileRecord, targetSummary, guideRecord, targetOutcomes);
 
   // 兼容 BetterGI 已保存的旧设置：字段不存在时也默认开启读取。
   if (!allTargetsSatisfied && scriptSettings.scanInventory !== false) {
@@ -208,12 +368,13 @@ async function main() {
       rulebook,
       today,
     });
-    attachTargetContext(plan, profileRecord, targetSummary);
+    attachTargetContext(plan, profileRecord, targetSummary, guideRecord, targetOutcomes);
     plan.inventoryUncertainties = historicalInventoryConflicts;
   } else if (!allTargetsSatisfied) {
     log.info('[背包] 已关闭自动读取，库存仅使用目标文件中的 inventory 字段');
   }
 
+  plan.domainOpenings = limitedOpenings.openings;
   if (allTargetsSatisfied) {
     plan.routes = { matched: [], missing: [] };
   } else if (scriptSettings.discoverRoutes !== false) {
@@ -297,6 +458,11 @@ async function main() {
   }
   plan.domainResinPolicy = domainResinPolicy;
   plan.resinPolicyV2 = resinPolicyV2;
+  sendNotificationSafely(() => buildPlanReadySummary({
+    targetCount: (targetData.targets ?? []).length,
+    targetSummary,
+    queue: plan.executionQueue,
+  }), '执行计划进度');
   const inventoryBeforeExecution = { ...inventory };
   const trackedMaterialIds = [...plan.crafting.scanMaterialIds];
 
@@ -318,14 +484,7 @@ async function main() {
       }
     }
     if (execution.status !== 'failed' && !allTargetsSatisfied) {
-      execution = await executeResinQueue(
-        compiledQueue.entries,
-        scriptSettings,
-        partySwitchState,
-        historicalInventoryConflicts.length > 0
-          ? '执行前背包识别与历史确认记录冲突，已暂停相关任务'
-          : null,
-      );
+      execution = await executeResinQueue(compiledQueue.entries, scriptSettings, partySwitchState);
     }
     execution.warnings = [...runWarnings, ...(execution.warnings ?? [])];
     plan.execution = execution;
@@ -379,7 +538,8 @@ async function main() {
           endedAt: new Date().toISOString(),
         }));
       }
-      if ((execution.tasks?.length ?? 0) > 0 && execution.status !== 'failed' && execution.code !== 'no_resin') {
+      if (execution.tasks?.some((task) => task.code !== 'native_unsupported')
+        && execution.status !== 'failed' && execution.code !== 'no_resin') {
         const evidence = {
           taskRecognizedRewards: execution.taskRecognizedRewards,
           inventoryTrackedRewards: execution.inventoryTrackedRewards,
@@ -464,7 +624,7 @@ async function main() {
         rulebook,
         today,
       });
-      attachTargetContext(plan, profileRecord, targetSummary);
+      attachTargetContext(plan, profileRecord, targetSummary, guideRecord, targetOutcomes);
       plan.routes = discoveredRoutes;
       applyMatchedRouteSupport(plan, discoveredRoutes);
       plan.weeklyStrategy = buildWeeklyStrategy(plan.weeklyPlan, today);
@@ -526,17 +686,15 @@ async function main() {
   const updatedHistory = appendRunHistory(history, runRecord);
   await file.writeText('record/history.json', JSON.stringify(updatedHistory, null, 2), false);
   log.info('[记录] 已保存本次运行记录；历史保留 {count} 条', updatedHistory.length);
-  if (scriptSettings.sendRunSummary === true) {
+  if (failureNotificationState.enabled) {
     failureNotificationState.stage = '发送运行摘要';
-    const summary = buildRunSummary(plan, materials, {
+    sendNotificationSafely(() => buildRunSummary(plan, materials, {
       executionEnabled,
       execution: plan.execution,
       estimateDays: estimate.days,
       estimateReason: estimate.reason,
       estimateDetails: estimate.details,
-    });
-    notification.Send(summary);
-    log.info('[通知] 已请求 BetterGI 发送运行摘要；请在 BetterGI 通知设置中启用 JS 通知与邮件通知');
+    }), '运行摘要');
   }
   const routeCount = plan.execution?.routes?.length ?? 0;
   const resinTaskCount = plan.execution?.tasks?.length ?? 0;
@@ -554,21 +712,26 @@ async function main() {
   log.info('[完成] 已保存计划记录：record/latest-plan.json；{result}', finalResult);
 }
 
+/** 通知失败不能中断培养流程。 */
+function sendNotificationSafely(buildMessage, label) {
+  if (!failureNotificationState.enabled) return;
+  try {
+    notification.Send(limitNotificationMessage(buildMessage()));
+    log.info('[通知] 已请求 BetterGI 发送{label}', label);
+  } catch (error) {
+    log.error('[通知] 发送{label}失败，已继续原流程：{error}', label, error?.message ?? String(error));
+  }
+}
+
 /** 失败通知自身不能覆盖原始异常。 */
 function sendFailureSummarySafely(error) {
   const scriptSettings = failureNotificationState.settings;
-  if (scriptSettings?.sendRunSummary !== true) return;
-  try {
-    const summary = buildFailureRunSummary({
-      stage: failureNotificationState.stage,
-      targets: scriptSettings.targetsText ? [scriptSettings.targetsText] : [],
-      reason: error?.message ?? String(error),
-    });
-    notification.Send(summary);
-    log.info('[通知] 已请求 BetterGI 发送失败摘要；原始异常仍会继续抛出');
-  } catch (notificationError) {
-    log.error('[通知] 发送失败摘要时再次出错：{error}', notificationError?.message ?? String(notificationError));
-  }
+  if (!failureNotificationState.enabled || scriptSettings?.sendRunSummary !== true) return;
+  sendNotificationSafely(() => buildFailureRunSummary({
+    stage: failureNotificationState.stage,
+    targets: scriptSettings.targetsText ? [scriptSettings.targetsText] : [],
+    reason: error?.message ?? String(error),
+  }), '失败摘要');
 }
 
 function loadTargets(scriptSettings, rulebook) {
@@ -582,15 +745,54 @@ function loadTargets(scriptSettings, rulebook) {
   return JSON.parse(file.readTextSync(targetFile));
 }
 
-function attachTargetContext(plan, profile, targetSummary) {
-  plan.profile = profile;
-  plan.targetSummary = targetSummary;
-  plan.targetOutcomes = profile?.targetOutcomes ?? [];
+/** 未选择任何原计划角色或武器时，把勾选指南解释为纯指南计划。 */
+function isEmptyGuideOnlySelection(scriptSettings) {
+  if (scriptSettings.appendTrainingGuide !== true || scriptSettings.customTargetsEnabled === true) return false;
+  const characterName = String(scriptSettings.selectedCharacter ?? '').trim();
+  const weaponName = String(scriptSettings.selectedWeapon ?? '').trim();
+  return (!characterName || characterName === '不选择角色')
+    && (!weaponName || weaponName === '不选择武器');
 }
 
-async function executeResinQueue(entries, settings, partySwitchState, emptyReason = null) {
+function loadObservedCharacters(path) {
+  if (!file.IsFile(path)) return {};
+  let observed;
+  try {
+    observed = JSON.parse(file.readTextSync(path));
+  } catch {
+    throw new Error('预培养实读记录损坏，拒绝回退到初始进度');
+  }
+  if (!observed || typeof observed !== 'object' || Array.isArray(observed)) {
+    throw new Error('预培养实读记录损坏，拒绝回退到初始进度');
+  }
+  for (const [name, value] of Object.entries(observed)) {
+    if (!name.trim() || ['__proto__', 'constructor', 'prototype'].includes(name) || value !== true) {
+      throw new Error('预培养实读记录损坏，拒绝回退到初始进度');
+    }
+  }
+  return observed;
+}
+
+async function persistObservedCharacters(path, observedCharacters) {
+  const text = JSON.stringify(observedCharacters);
+  try {
+    await file.writeText(path, text, false);
+    if (file.readTextSync(path) !== text) throw new Error('写入后校验不一致');
+  } catch (error) {
+    throw new Error(`无法保存预培养实读记录，已停止执行：${error?.message ?? String(error)}`);
+  }
+}
+
+function attachTargetContext(plan, profile, targetSummary, guide = null, targetOutcomes = null) {
+  plan.profile = profile;
+  plan.targetSummary = targetSummary;
+  plan.targetOutcomes = targetOutcomes ?? profile?.targetOutcomes ?? [];
+  if (guide) plan.guide = guide;
+}
+
+async function executeResinQueue(entries, settings, partySwitchState) {
   if (entries.length === 0) {
-    const reason = emptyReason || '今日没有已启用的树脂任务';
+    const reason = '今日没有已启用的树脂任务';
     log.info('[执行] {reason}，本次不执行', reason);
     return createRunExecution({
       status: 'skipped', code: 'no_candidate', stage: 'preflight',
@@ -603,16 +805,20 @@ async function executeResinQueue(entries, settings, partySwitchState, emptyReaso
     let execution;
     try {
       if (entry.task.executionType === 'boss') {
-        execution = await executeBossTask(entry, partySwitchState);
+        execution = await executeBossTask(entry, partySwitchState, settings.allowUnowned === true);
       } else if (entry.task.executionType === 'artifactDomain') {
         execution = await executeArtifactDomainTask(entry, partySwitchState);
       } else {
-        execution = await executeDomainTask(entry, partySwitchState);
+        execution = await executeDomainTask(entry, partySwitchState, settings.allowUnowned === true);
       }
     } catch (error) {
       const failure = classifyExecutionError(error);
       execution = createRunExecution({ task: entry.task, ...failure });
-      log.error('[执行队列] “{target}”未完成：{error}', target, execution.reason);
+      if (execution.code === 'native_unsupported') {
+        log.warn('[预刷] BetterGI 暂不支持“{target}”，本轮跳过并尝试其他候选；下次运行仍会重试：{error}', target, execution.reason);
+      } else {
+        log.error('[执行队列] “{target}”未完成：{error}', target, execution.reason);
+      }
     }
     const stopReason = entry.maxClaims == null && execution.status === 'completed'
       ? '该任务使用“全部”预算，已把剩余可用树脂交给当前任务'
@@ -627,7 +833,7 @@ async function executeResinQueue(entries, settings, partySwitchState, emptyReaso
   return combineRunExecutions(executions);
 }
 
-async function executeDomainTask(entry, partySwitchState) {
+async function executeDomainTask(entry, partySwitchState, allowUnowned = false) {
   const { task, config } = entry;
   const startedAt = new Date().toISOString();
   log.info('[执行] 准备刷取秘境“{domain}”，材料目标：{materials}', config.domainName,
@@ -660,7 +866,9 @@ async function executeDomainTask(entry, partySwitchState) {
     rawRewards = await dispatcher.RunAutoDomainTask(param);
   } catch (error) {
     throw withExecutionContext(error, {
-      code: 'external_task_error', stage: 'task', evidence: { task }, startedAt,
+      code: allowUnowned && isUnsupportedNativeTask(error, task)
+        ? 'native_unsupported' : 'external_task_error',
+      stage: 'task', evidence: { task }, startedAt,
     });
   }
   const taskRecognizedRewards = normalizeRewardMap(rawRewards);
@@ -730,7 +938,7 @@ async function executeArtifactDomainTask(entry, partySwitchState) {
   });
 }
 
-async function executeBossTask(entry, partySwitchState) {
+async function executeBossTask(entry, partySwitchState, allowUnowned = false) {
   const { task, config } = entry;
   const startedAt = new Date().toISOString();
   log.info('[Boss] 准备刷取“{boss}”，材料目标：{materials}', config.bossName,
@@ -757,7 +965,16 @@ async function executeBossTask(entry, partySwitchState) {
   let rawRewards;
   try {
     rawRewards = await runBossTaskWithSafeExit({
-      runTask: () => dispatcher.RunAutoBossTask(param),
+      runTask: async () => {
+        try {
+          return await dispatcher.RunAutoBossTask(param);
+        } catch (error) {
+          if (allowUnowned && isUnsupportedNativeTask(error, task)) {
+            throw withExecutionContext(error, { code: 'native_unsupported', stage: 'task', evidence: { task }, startedAt });
+          }
+          throw error;
+        }
+      },
       teleportToStatue: () => genshin.TpToStatueOfTheSeven(),
       logger: log,
       onCleanupFailure: (error) => cleanupWarnings.push(createExecutionOutcome({

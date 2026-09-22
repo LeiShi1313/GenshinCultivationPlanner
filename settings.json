@@ -21,6 +21,12 @@
     "default": "读取档案并执行"
   },
   {
+    "name": "allowUnowned",
+    "type": "checkbox",
+    "label": "允许预刷（未拥有角色按1级、天赋1/1/1；拥有后自动读取）",
+    "default": false
+  },
+  {
     "name": "autoWeaponMode",
     "type": "select",
     "label": "培养内容",
@@ -596,6 +602,12 @@
     "default": "80>90"
   },
   {
+    "name": "appendTrainingGuide",
+    "type": "checkbox",
+    "label": "附加提升指南培养计划（默认关闭）",
+    "default": false
+  },
+  {
     "name": "domainSection",
     "type": "separator",
     "label": "\n━━━━━━━━━━━━━━━━━━ 培养材料秘境 ━━━━━━━━━━━━━━━━━━\n"
@@ -1131,7 +1143,7 @@
   {
     "name": "sendRunSummary",
     "type": "checkbox",
-    "label": "发送运行摘要",
+    "label": "发送关键进度与运行摘要",
     "default": false
   }
 ]
