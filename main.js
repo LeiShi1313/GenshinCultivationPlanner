@@ -238,6 +238,11 @@ async function main() {
       }
       guideTargetData = builtGuideTargetData;
       for (const line of guideTargetData.targetSummary) log.info('[提升指南] {summary}', line);
+      const guideFailures = guideTargetData.targetOutcomes.filter((outcome) => outcome.status === 'failed');
+      for (const outcome of guideFailures) log.warn('[提升指南] {message}', outcome.message);
+      if (!originalConfigured && guideTargetData.guide.targetRequests.length === 0 && guideFailures.length > 0) {
+        throw new Error(`提升指南没有可用角色：${guideFailures.map((outcome) => outcome.message).join('；')}`);
+      }
       if (combined.skippedGuideTargets.length > 0) {
         log.info('[提升指南] 原计划优先，已跳过 {count} 个同名同类目标', combined.skippedGuideTargets.length);
       }
@@ -248,6 +253,8 @@ async function main() {
         log.error('[提升指南] {message}', error?.message ?? String(error));
         throw withExecutionContext(error, { code: 'guide_invalid', stage: 'profile' });
       }
+      // BetterGI sleep observes the native cancellation token before falling back.
+      await sleep(1);
       targetData = originalTargetData;
       targetSummary = originalTargetSummary;
       targetOutcomes = originalTargetOutcomes;
@@ -292,7 +299,12 @@ async function main() {
   let inventoryBeforeIssueNames = [];
   let inventoryBeforeNotFoundNames = [];
   let historicalInventoryConflicts = [];
-  const runWarnings = [];
+  const runWarnings = targetOutcomes.filter((outcome) => outcome.component === 'guide' && outcome.status === 'failed')
+    .map((outcome) => createExecutionOutcome({
+      taskId: `guide:${outcome.name}`, taskType: 'guide', targetName: outcome.name,
+      status: 'skipped', code: 'guide_character_invalid', stage: 'profile', severity: 'warning',
+      message: outcome.message,
+    }));
   let plan = createPlan({
     targets: targetData.targets ?? [],
     inventory,

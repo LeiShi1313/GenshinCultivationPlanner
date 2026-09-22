@@ -1,4 +1,6 @@
 import { buildAutomaticProfileTargets, buildTargetSummary, readCharacterProfile } from './character-profile.js';
+import { expandTargets } from './requirements.js';
+import { withExecutionContext } from './error-classifier.js';
 
 const MAX_GUIDE_AGE_MS = 5 * 60 * 1000;
 const TALENT_SLOT_KEYS = Object.freeze({
@@ -18,55 +20,83 @@ export async function buildGuideTargetData({
   nowMs = Date.now(),
 }) {
   const { collection, preview } = requireFreshGuideSnapshot(snapshot, nowMs);
-  const requests = prepareRequests(preview, identities, rulebook);
-  const limitedOpenSources = collectLimitedOpenSources(collection, requests);
+  if (!identities?.characters || !identities?.weapons || !rulebook?.characters || !rulebook?.weapons) {
+    throw new Error('提升指南目标映射缺少身份或规则目录');
+  }
+  const requests = [];
   const targets = [];
   const targetSummary = [];
   const targetOutcomes = [];
   const profiles = [];
 
-  for (const request of requests) {
-    const cachedProfile = profilesByCharacter?.[request.characterName];
-    const profile = cachedProfile ?? await readCharacterProfile(service, {
-      characterName: request.characterName,
-      categories: '属性;武器;天赋',
-    });
-    if (profile?.characterName !== request.characterName) {
-      throw new Error(`角色档案返回“${profile?.characterName ?? '未知角色'}”，与提升指南“${request.characterName}”不一致`);
+  function skipCharacter(character, error) {
+    const name = character?.name ?? null;
+    const message = `提升指南角色“${name ?? '未确认'}”已跳过：${error?.message ?? String(error)}`;
+    targetOutcomes.push({ kind: 'character', component: 'guide', status: 'failed', name, message });
+    targetSummary.push(message);
+  }
+
+  for (const character of preview.characterProgress) {
+    let request;
+    try {
+      request = prepareRequest(character, identities, rulebook);
+    } catch (error) {
+      skipCharacter(character, error);
+      continue;
+    }
+    // Native reads and persistence are outside role-local validation recovery.
+    let profile;
+    try {
+      profile = profilesByCharacter?.[request.characterName] ?? await readCharacterProfile(service, {
+        characterName: request.characterName,
+        categories: '属性;武器;天赋',
+      });
+      if (profile?.characterName !== request.characterName) {
+        throw new Error(`角色档案返回“${profile?.characterName ?? '未知角色'}”，与提升指南“${request.characterName}”不一致`);
+      }
+    } catch (error) {
+      throw withExecutionContext(error, { code: 'profile_invalid', stage: 'profile' });
     }
     // A genuine profile remains observed even if later guide validation rejects its goals.
     await onProfile?.(profile);
-    const settings = buildProfileSettings(request, profile);
-    const guideLevelCompleted = request.level.noUpgradeNeeded === true
-      && request.level.current >= 90 && request.level.current <= 100 && request.level.target === 90;
-    const planningProfile = guideLevelCompleted ? {
-      ...profile,
-      character: { ...profile.character, level: 90, levelLimit: 90 },
-    } : profile;
-    const generated = buildAutomaticProfileTargets(planningProfile, settings, rulebook, {
-      characterName: request.characterName,
-      cultivationMode: '培养角色和当前佩戴武器',
-      requiresProfile: true,
-      previewOnly: false,
-    });
-    if (guideLevelCompleted) {
-      const actual = `${profile.character.level}/${profile.character.levelLimit}`;
-      const levelOutcome = generated.targetOutcomes.find((outcome) =>
-        outcome.kind === 'character' && outcome.component === 'level');
-      if (levelOutcome?.status !== 'completed') {
-        throw new Error(`提升指南角色“${request.characterName}”的普通等级完成态无法生成`);
+    try {
+      const settings = buildProfileSettings(request, profile);
+      const guideLevelCompleted = request.level.noUpgradeNeeded === true
+        && request.level.current >= 90 && request.level.current <= 100 && request.level.target === 90;
+      const planningProfile = guideLevelCompleted ? {
+        ...profile,
+        character: { ...profile.character, level: 90, levelLimit: 90 },
+      } : profile;
+      const generated = buildAutomaticProfileTargets(planningProfile, settings, rulebook, {
+        characterName: request.characterName,
+        cultivationMode: '培养角色和当前佩戴武器',
+        requiresProfile: true,
+        previewOnly: false,
+      });
+      if (guideLevelCompleted) {
+        const actual = `${profile.character.level}/${profile.character.levelLimit}`;
+        const levelOutcome = generated.targetOutcomes.find((outcome) =>
+          outcome.kind === 'character' && outcome.component === 'level');
+        if (levelOutcome?.status !== 'completed') {
+          throw new Error(`提升指南角色“${request.characterName}”的普通等级完成态无法生成`);
+        }
+        levelOutcome.message = `提升指南明确无需提升；档案原始等级 ${actual}，普通等级材料规划按 90/90 已完成处理`;
+        generated.summary.unshift(`角色 ${request.characterName}：提升指南明确无需提升；档案原始等级 ${actual}，普通等级材料规划按 90/90 已完成处理`);
       }
-      levelOutcome.message = `提升指南明确无需提升；档案原始等级 ${actual}，普通等级材料规划按 90/90 已完成处理`;
-      generated.summary.unshift(`角色 ${request.characterName}：提升指南明确无需提升；档案原始等级 ${actual}，普通等级材料规划按 90/90 已完成处理`);
+      const failures = generated.targetOutcomes.filter((outcome) => outcome.status === 'failed');
+      if (failures.length > 0) {
+        throw new Error(`提升指南角色“${request.characterName}”无法生成完整目标：${failures.map((item) => item.message).join('；')}`);
+      }
+      // Validate every needed cost stage before this role reaches the shared planner.
+      expandTargets(generated.targets, rulebook);
+      targets.push(...generated.targets);
+      targetSummary.push(...generated.summary);
+      targetOutcomes.push(...generated.targetOutcomes);
+      profiles.push(profile);
+      requests.push(request);
+    } catch (error) {
+      skipCharacter(character, error);
     }
-    const failures = generated.targetOutcomes.filter((outcome) => outcome.status === 'failed');
-    if (failures.length > 0) {
-      throw new Error(`提升指南角色“${request.characterName}”无法生成完整目标：${failures.map((item) => item.message).join('；')}`);
-    }
-    targets.push(...generated.targets);
-    targetSummary.push(...generated.summary);
-    targetOutcomes.push(...generated.targetOutcomes);
-    profiles.push(profile);
   }
 
   return {
@@ -81,7 +111,7 @@ export async function buildGuideTargetData({
       capturedAt: collection.completed_at,
       characters: requests.map((request) => request.characterName),
       targetRequests: requests,
-      limitedOpenSources,
+      limitedOpenSources: collectLimitedOpenSources(collection, requests),
     },
   };
 }
@@ -155,7 +185,8 @@ export function appendGuideTargetData({
 
   const appendedIdentities = new Set(appendedGuideTargets.map(targetIdentity));
   const guideOutcomes = Array.isArray(guideTargetData?.targetOutcomes)
-    ? guideTargetData.targetOutcomes.filter((outcome) => appendedIdentities.has(targetIdentity(outcome))) : [];
+    ? guideTargetData.targetOutcomes.filter((outcome) => outcome.component === 'guide'
+      || appendedIdentities.has(targetIdentity(outcome)) || !seen.has(targetIdentity(outcome))) : [];
   const targetSummary = [
     ...(Array.isArray(originalTargetSummary) ? originalTargetSummary : []),
     ...buildTargetSummary(appendedGuideTargets),
@@ -263,90 +294,85 @@ function requireFreshGuideSnapshot(snapshot, nowMs) {
       || character.level !== preview.characterProgress[index]?.level?.current)) {
     throw new Error('提升指南角色列表与预览不一致');
   }
+  if (new Set(homeCharacters.map((character) => character.name)).size !== homeCharacters.length) {
+    throw new Error('提升指南角色列表包含重复角色');
+  }
   return { collection, preview };
 }
 
-function prepareRequests(preview, identities, rulebook) {
-  if (!identities?.characters || !identities?.weapons || !rulebook?.characters || !rulebook?.weapons) {
-    throw new Error('提升指南目标映射缺少身份或规则目录');
+function prepareRequest(character, identities, rulebook) {
+  const characterName = requireText(character?.name, '提升指南角色名称');
+  if (!rulebook.characters[characterName]) throw new Error(`规则库中没有提升指南角色：“${characterName}”`);
+
+  const identity = identities.characters[characterName];
+  const skills = identity?.talentIdentity === 'exact' ? identity.combatSkills : null;
+  if (!Array.isArray(skills) || skills.length !== 3) {
+    throw new Error(`提升指南角色“${characterName}”缺少精确天赋身份`);
   }
-  const names = new Set();
-  return preview.characterProgress.map((character) => {
-    const characterName = requireText(character?.name, '提升指南角色名称');
-    if (names.has(characterName)) throw new Error(`提升指南角色重复：“${characterName}”`);
-    names.add(characterName);
-    if (!rulebook.characters[characterName]) throw new Error(`规则库中没有提升指南角色：“${characterName}”`);
+  const talentKeyByName = new Map();
+  const talentKeys = new Set();
+  for (const skill of skills) {
+    const key = TALENT_SLOT_KEYS[skill?.slot];
+    const name = skill?.canonicalName;
+    if (!key || typeof name !== 'string' || !name || talentKeyByName.has(name) || talentKeys.has(key)) {
+      throw new Error(`提升指南角色“${characterName}”的天赋身份无效`);
+    }
+    talentKeyByName.set(name, key);
+    talentKeys.add(key);
+  }
+  if (talentKeyByName.size !== 3 || talentKeys.size !== 3) {
+    throw new Error(`提升指南角色“${characterName}”的天赋身份不完整`);
+  }
 
-    const identity = identities.characters[characterName];
-    const skills = identity?.talentIdentity === 'exact' ? identity.combatSkills : null;
-    if (!Array.isArray(skills) || skills.length !== 3) {
-      throw new Error(`提升指南角色“${characterName}”缺少精确天赋身份`);
-    }
-    const talentKeyByName = new Map();
-    const talentKeys = new Set();
-    for (const skill of skills) {
-      const key = TALENT_SLOT_KEYS[skill?.slot];
-      const name = skill?.canonicalName;
-      if (!key || typeof name !== 'string' || !name || talentKeyByName.has(name) || talentKeys.has(key)) {
-        throw new Error(`提升指南角色“${characterName}”的天赋身份无效`);
-      }
-      talentKeyByName.set(name, key);
-      talentKeys.add(key);
-    }
-    if (talentKeyByName.size !== 3 || talentKeys.size !== 3) {
-      throw new Error(`提升指南角色“${characterName}”的天赋身份不完整`);
-    }
+  const level = character.level;
+  if (level?.incomplete !== false) throw new Error(`提升指南角色“${characterName}”的等级目标不完整`);
+  requirePositiveInteger(level.current, `提升指南角色“${characterName}”的当前等级`);
+  let targetLevel = level.target;
+  if (targetLevel === null && level.noUpgradeNeeded === true
+      && Number.isInteger(level.current) && level.current >= 90 && level.current <= 100) targetLevel = 90;
+  else if (targetLevel === null && level.noUpgradeNeeded === true) {
+    throw new Error(`提升指南角色“${characterName}”的无升级等级 ${level.current} 暂不受规则库支持`);
+  }
+  else requirePositiveInteger(targetLevel, `提升指南角色“${characterName}”的目标等级`);
 
-    const level = character.level;
-    if (level?.incomplete !== false) throw new Error(`提升指南角色“${characterName}”的等级目标不完整`);
-    requirePositiveInteger(level.current, `提升指南角色“${characterName}”的当前等级`);
-    let targetLevel = level.target;
-    if (targetLevel === null && level.noUpgradeNeeded === true
-        && Number.isInteger(level.current) && level.current >= 90 && level.current <= 100) targetLevel = 90;
-    else if (targetLevel === null && level.noUpgradeNeeded === true) {
-      throw new Error(`提升指南角色“${characterName}”的无升级等级 ${level.current} 暂不受规则库支持`);
-    }
-    else requirePositiveInteger(targetLevel, `提升指南角色“${characterName}”的目标等级`);
+  const weapon = character.weapon;
+  if (weapon?.incomplete !== false) throw new Error(`提升指南角色“${characterName}”的武器目标不完整`);
+  const weaponName = requireText(weapon.name, `提升指南角色“${characterName}”的武器名称`);
+  if (!Array.isArray(identities.weapons[weaponName]) || identities.weapons[weaponName].length !== 1) {
+    throw new Error(`提升指南武器身份不明确：“${weaponName}”`);
+  }
+  if (!rulebook.weapons[weaponName]) throw new Error(`规则库中没有提升指南武器：“${weaponName}”`);
+  requirePositiveInteger(weapon.current, `提升指南武器“${weaponName}”的当前等级`);
+  requirePositiveInteger(weapon.target, `提升指南武器“${weaponName}”的目标等级`);
 
-    const weapon = character.weapon;
-    if (weapon?.incomplete !== false) throw new Error(`提升指南角色“${characterName}”的武器目标不完整`);
-    const weaponName = requireText(weapon.name, `提升指南角色“${characterName}”的武器名称`);
-    if (!Array.isArray(identities.weapons[weaponName]) || identities.weapons[weaponName].length !== 1) {
-      throw new Error(`提升指南武器身份不明确：“${weaponName}”`);
-    }
-    if (!rulebook.weapons[weaponName]) throw new Error(`规则库中没有提升指南武器：“${weaponName}”`);
-    requirePositiveInteger(weapon.current, `提升指南武器“${weaponName}”的当前等级`);
-    requirePositiveInteger(weapon.target, `提升指南武器“${weaponName}”的目标等级`);
-
-    const talents = {};
-    if (character.talents?.incomplete !== false || !Array.isArray(character.talents.talents)
-      || character.talents.talents.length === 0) {
-      throw new Error(`提升指南角色“${characterName}”的天赋目标不完整`);
-    }
-    for (const talent of character.talents.talents) {
-      const talentName = requireText(talent?.name, `提升指南角色“${characterName}”的天赋名称`);
-      const key = talentKeyByName.get(talentName);
-      if (!key || talents[key]) throw new Error(`提升指南角色“${characterName}”的天赋身份不明确：“${talentName}”`);
-      requirePositiveInteger(talent.displayedCurrent, `提升指南天赋“${talentName}”的当前等级`);
-      requirePositiveInteger(talent.target, `提升指南天赋“${talentName}”的目标等级`);
-      talents[key] = {
-        name: talentName,
-        displayedCurrent: talent.displayedCurrent,
-        displayedTarget: talent.target,
-      };
-    }
-
-    return {
-      characterName,
-      level: {
-        current: level.current,
-        target: targetLevel,
-        noUpgradeNeeded: level.noUpgradeNeeded === true,
-      },
-      weapon: { name: weaponName, current: weapon.current, target: weapon.target },
-      talents,
+  const talents = {};
+  if (character.talents?.incomplete !== false || !Array.isArray(character.talents.talents)
+    || character.talents.talents.length === 0) {
+    throw new Error(`提升指南角色“${characterName}”的天赋目标不完整`);
+  }
+  for (const talent of character.talents.talents) {
+    const talentName = requireText(talent?.name, `提升指南角色“${characterName}”的天赋名称`);
+    const key = talentKeyByName.get(talentName);
+    if (!key || talents[key]) throw new Error(`提升指南角色“${characterName}”的天赋身份不明确：“${talentName}”`);
+    requirePositiveInteger(talent.displayedCurrent, `提升指南天赋“${talentName}”的当前等级`);
+    requirePositiveInteger(talent.target, `提升指南天赋“${talentName}”的目标等级`);
+    talents[key] = {
+      name: talentName,
+      displayedCurrent: talent.displayedCurrent,
+      displayedTarget: talent.target,
     };
-  });
+  }
+
+  return {
+    characterName,
+    level: {
+      current: level.current,
+      target: targetLevel,
+      noUpgradeNeeded: level.noUpgradeNeeded === true,
+    },
+    weapon: { name: weaponName, current: weapon.current, target: weapon.target },
+    talents,
+  };
 }
 
 function buildProfileSettings(request, profile) {

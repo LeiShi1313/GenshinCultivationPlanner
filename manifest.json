@@ -19,7 +19,6 @@
     "collection.json",
     "preview.json",
     "collection-failure.png",
-    "raw/**/*.json",
-    "raw/**/*.png"
+    "raw/"
   ]
 }
