@@ -1,6 +1,6 @@
 {
   "source": "BetterGI 内置 AutoTrackPath/Assets/tp.json 的 MasteryDomain 与 ForgeryDomain 条目",
-  "verification": "2026-07-20 从 BetterGI 源码工作副本提取；用于规则库生成时的名称校验",
+  "verification": "2026-07-20 从 BetterGI 源码工作副本提取；2026-09-18 以 BetterGI 0.64 已安装 tp.json 补充核对；用于规则库生成时的名称校验",
   "materialDomains": [
     "忘却之峡",
     "塞西莉亚苗圃",
@@ -15,6 +15,8 @@
     "蕴火的幽墟",
     "深古瞭望所",
     "无光的深都",
-    "失落的月庭"
+    "失落的月庭",
+    "荒坠的圣迹",
+    "妄念的创痕"
   ]
 }

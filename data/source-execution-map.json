@@ -41,7 +41,13 @@
     "精通秘境：覆巢": { "domainName": "无光的深都", "priority": 100, "verification": "BetterGI 内置 tp.json 奖励表对照；待实机回归" },
     "炼武秘境：明辉": { "domainName": "失落的月庭", "priority": 100, "verification": "BetterGI 内置 tp.json 奖励表对照；待实机回归" },
     "炼武秘境：祷颂": { "domainName": "失落的月庭", "priority": 100, "verification": "BetterGI 内置 tp.json 奖励表对照；待实机回归" },
-    "炼武秘境：祭月": { "domainName": "失落的月庭", "priority": 100, "verification": "BetterGI 内置 tp.json 奖励表对照；待实机回归" }
+    "炼武秘境：祭月": { "domainName": "失落的月庭", "priority": 100, "verification": "BetterGI 内置 tp.json 奖励表对照；待实机回归" },
+    "精通秘境：隐修": { "domainName": "荒坠的圣迹", "priority": 100, "verification": "BetterGI 0.64 已安装 tp.json 奖励表对照；待实机回归" },
+    "精通秘境：默想": { "domainName": "荒坠的圣迹", "priority": 100, "verification": "BetterGI 0.64.0 f0cd4fe 源码支持；未实机回归" },
+    "精通秘境：共观": { "domainName": "荒坠的圣迹", "priority": 100, "verification": "BetterGI 0.64 已安装 tp.json 奖励表对照；待实机回归" },
+    "炼武秘境：铸铁": { "domainName": "妄念的创痕", "priority": 100, "verification": "BetterGI 0.64 已安装 tp.json 奖励表对照；待实机回归" },
+    "炼武秘境：链轨": { "domainName": "妄念的创痕", "priority": 100, "verification": "BetterGI 0.64 已安装 tp.json 奖励表对照；待实机回归" },
+    "炼武秘境：断钢": { "domainName": "妄念的创痕", "priority": 100, "verification": "BetterGI 0.64 已安装 tp.json 奖励表对照；待实机回归" }
   },
   "worldBosses": {}
 }
