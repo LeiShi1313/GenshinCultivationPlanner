@@ -211,6 +211,27 @@ export function appendGuideTargetData({
   };
 }
 
+/**
+ * 自动档案或提升指南已经完成目标解析、但没有待培养目标时，禁止继续执行
+ * 圣遗物兜底和路线。失败项会单独标记为不完整，避免误报“全部完成”。
+ */
+export function classifyResolvedTargetState({
+  targets = [],
+  profileRecord = null,
+  guideRecord = null,
+  targetOutcomes = [],
+} = {}) {
+  const resolved = profileRecord != null || guideRecord != null;
+  const noPendingTargets = resolved && Array.isArray(targets) && targets.length === 0;
+  const hasFailures = Array.isArray(targetOutcomes)
+    && targetOutcomes.some((outcome) => outcome?.status === 'failed');
+  return {
+    suppressExecution: noPendingTargets,
+    allSatisfied: noPendingTargets && !hasFailures,
+    incomplete: noPendingTargets && hasFailures,
+  };
+}
+
 function requireTargets(targetData, label) {
   if (!targetData || !Array.isArray(targetData.targets)) throw new Error(`${label}无效`);
   return targetData.targets;

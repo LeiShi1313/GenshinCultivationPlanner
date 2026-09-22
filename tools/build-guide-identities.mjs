@@ -58,6 +58,7 @@ function buildCharacters() {
   }
   characters.sort(byNameThenId);
   for (const character of characters) {
+    if (character?.name === '奇偶·女性' || character?.name === '奇偶·男性') continue;
     if (!character?.name || result[character.name]) {
       throw new Error(`genshin-db 角色名称缺失或重复：${character?.name ?? '<unknown>'}`);
     }

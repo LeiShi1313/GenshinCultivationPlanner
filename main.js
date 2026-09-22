@@ -29,7 +29,12 @@ import {
   validateBossOverrideNames,
 } from './core/settings.js';
 import { readTrainingGuideSnapshot } from './guide-reader/index.js';
-import { appendGuideTargetData, buildGuideTargetData, resolveGuideDomainOpenings } from './core/guide-targets.js';
+import {
+  appendGuideTargetData,
+  buildGuideTargetData,
+  classifyResolvedTargetState,
+  resolveGuideDomainOpenings,
+} from './core/guide-targets.js';
 import { applyDomainOpeningOverrides } from './core/scheduler.js';
 import {
   createExecutionOutcome,
@@ -288,11 +293,17 @@ async function main() {
   for (const target of targetData.targets ?? []) {
     log.info('[目标] {kind}：{name}', target.kind, target.name);
   }
-  const allTargetsSatisfied = profileRecord != null
-    && (targetData.targets ?? []).length === 0
-    && !(profileRecord.targetOutcomes ?? []).some((outcome) => outcome.status === 'failed');
+  const resolvedTargetState = classifyResolvedTargetState({
+    targets: targetData.targets,
+    profileRecord,
+    guideRecord,
+    targetOutcomes,
+  });
+  const { allSatisfied: allTargetsSatisfied, suppressExecution } = resolvedTargetState;
   if (allTargetsSatisfied) {
     log.info('[目标] 所选培养目标均已达到，本次不读取背包、不检查路线且不执行刷取任务');
+  } else if (resolvedTargetState.incomplete) {
+    log.warn('[目标] 没有可安全执行的培养目标，且部分目标解析失败；本次不读取背包、不检查路线且不执行兜底任务');
   }
 
   let inventory = targetData.inventory ?? {};
@@ -316,7 +327,7 @@ async function main() {
   attachTargetContext(plan, profileRecord, targetSummary, guideRecord, targetOutcomes);
 
   // 兼容 BetterGI 已保存的旧设置：字段不存在时也默认开启读取。
-  if (!allTargetsSatisfied && scriptSettings.scanInventory !== false) {
+  if (!suppressExecution && scriptSettings.scanInventory !== false) {
     failureNotificationState.stage = '执行前读取背包';
     const initialInventoryScan = await scanInventoryMaterials(plan, inventory, materials, '执行前');
     inventory = initialInventoryScan.inventory;
@@ -370,12 +381,12 @@ async function main() {
     });
     attachTargetContext(plan, profileRecord, targetSummary, guideRecord, targetOutcomes);
     plan.inventoryUncertainties = historicalInventoryConflicts;
-  } else if (!allTargetsSatisfied) {
+  } else if (!suppressExecution) {
     log.info('[背包] 已关闭自动读取，库存仅使用目标文件中的 inventory 字段');
   }
 
   plan.domainOpenings = limitedOpenings.openings;
-  if (allTargetsSatisfied) {
+  if (suppressExecution) {
     plan.routes = { matched: [], missing: [] };
   } else if (scriptSettings.discoverRoutes !== false) {
     try {
@@ -406,7 +417,7 @@ async function main() {
 
   const domainResinPolicy = buildDomainResinPolicy(scriptSettings);
   const resinPolicyV2 = scriptSettings.resinPolicyV2;
-  if (!allTargetsSatisfied) appendArtifactFallbackTask(plan, scriptSettings, resinPolicyV2);
+  if (!suppressExecution) appendArtifactFallbackTask(plan, scriptSettings, resinPolicyV2);
   let compiledQueue;
   try {
     compiledQueue = compileResinExecutionQueue({
@@ -470,11 +481,15 @@ async function main() {
     failureNotificationState.stage = '执行刷取任务';
     const partySwitchState = { initialized: false };
     let execution = createRunExecution({
-      status: 'skipped', code: allTargetsSatisfied ? 'targets_satisfied' : 'no_candidate', stage: 'preflight',
-      message: allTargetsSatisfied ? '培养目标已全部完成' : '今日没有已启用的树脂任务',
+      status: 'skipped',
+      code: allTargetsSatisfied ? 'targets_satisfied'
+        : resolvedTargetState.incomplete ? 'target_resolution_incomplete' : 'no_candidate',
+      stage: 'preflight',
+      message: allTargetsSatisfied ? '培养目标已全部完成'
+        : resolvedTargetState.incomplete ? '没有可安全执行的培养目标，且部分目标解析失败' : '今日没有已启用的树脂任务',
     });
     let routeRecords = [];
-    if (!allTargetsSatisfied && resinPolicyV2.routeTiming === 'beforeResin' && scriptSettings.routeExecutionEnabled === true) {
+    if (!suppressExecution && resinPolicyV2.routeTiming === 'beforeResin' && scriptSettings.routeExecutionEnabled === true) {
       routeRecords = await executeRoutesSafely(discoveredRoutes, scriptSettings, materials, recipes, partySwitchState);
       if (routeRecords.some((route) => route.status === 'failed')) {
         execution = createRunExecution({
@@ -483,12 +498,12 @@ async function main() {
         });
       }
     }
-    if (execution.status !== 'failed' && !allTargetsSatisfied) {
+    if (execution.status !== 'failed' && !suppressExecution) {
       execution = await executeResinQueue(compiledQueue.entries, scriptSettings, partySwitchState);
     }
     execution.warnings = [...runWarnings, ...(execution.warnings ?? [])];
     plan.execution = execution;
-    if (!allTargetsSatisfied && resinPolicyV2.routeTiming === 'afterResin'
+    if (!suppressExecution && resinPolicyV2.routeTiming === 'afterResin'
       && execution.status !== 'failed'
       && scriptSettings.routeExecutionEnabled === true) {
       routeRecords = await executeRoutesSafely(discoveredRoutes, scriptSettings, materials, recipes, partySwitchState);

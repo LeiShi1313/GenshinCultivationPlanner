@@ -370,7 +370,7 @@ test('自动档案仅预览在背包扫描和任务调度前直接结束', () =>
   assert.ok(previewReturn < firstInventoryScan);
   assert.ok(previewReturn < queueCompile);
   assert.match(source.slice(previewBranch, previewReturn), /未读取背包、未执行刷取任务、未发送通知/);
-  assert.match(source, /if \(!allTargetsSatisfied && scriptSettings\.scanInventory !== false\)/);
-  assert.match(source, /if \(!allTargetsSatisfied\) appendArtifactFallbackTask/);
+  assert.match(source, /if \(!suppressExecution && scriptSettings\.scanInventory !== false\)/);
+  assert.match(source, /if \(!suppressExecution\) appendArtifactFallbackTask/);
   assert.match(source, /if \(request\.requiresProfile\)/);
 });
