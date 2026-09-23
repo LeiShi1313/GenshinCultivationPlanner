@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createPlan } from '../core/planner.js';
-import { applyInventoryScanResult, buildInventoryScanGroups, getInventoryTab, invalidateCraftingFamilies } from '../core/inventory.js';
+import { applyInventoryScanResult, buildInventoryScanGroups, getInventoryTab } from '../core/inventory.js';
 import { applyMatchedRouteSupport, discoverAutoPathingRoutes } from '../core/routes.js';
 import {
   buildFailureRunSummary,
@@ -652,7 +652,7 @@ test('背包读取首次未找到按零计，结束复核未找到则保留原�
   assert.deepEqual(preserved.decreasedNames, ['天赋书']);
 });
 
-test('历史确认有库存但本次未找到时标记冲突并使整条合成链未知', () => {
+test('历史确认有库存但本次未找到时记录风险并按零继续规划', () => {
   const chainMaterials = {
     low: { name: '光砂', status: 'supported' },
     mid: { name: '辉岩', status: 'supported' },
@@ -679,20 +679,21 @@ test('历史确认有库存但本次未找到时标记冲突并使整条合成�
     timestamp: '2026-08-31T17:15:06.000Z', source: 'task-recognition',
   }]);
 
-  const invalidated = invalidateCraftingFamilies({ low: 91, mid: 0, high: 25 }, ['mid'], chainRecipes);
-  assert.deepEqual(new Set(invalidated.invalidatedIds), new Set(['low', 'mid', 'high']));
-  assert.deepEqual(invalidated.inventory, {});
-
   const plan = createPlan({
-    targets: [{ id: 'weapon', requirements: [{ materialId: 'high', count: 6 }] }],
-    inventory: invalidated.inventory,
+    targets: [{ id: 'weapon', requirements: [{ materialId: 'high', count: 26 }] }],
+    inventory: { low: 0, mid: 0, high: 25 },
     materials: chainMaterials,
     recipes: chainRecipes,
     rulebook: {},
     today: 1,
   });
-  assert.equal(plan.displayShortages[0].status, 'unknown');
-  assert.equal(plan.todayQueue.length, 0);
+  assert.equal(plan.displayShortages[0].status, 'supported');
+  assert.equal(plan.displayShortages[0].shortage, 1);
+
+  const source = readFileSync(new URL('../main.js', import.meta.url), 'utf8');
+  assert.match(source, /本次按 0 继续计算和刷取，可能重复获取/);
+  assert.doesNotMatch(source, /已暂停相关合成链任务/);
+  assert.doesNotMatch(source, /invalidateCraftingFamilies\(/);
 });
 
 test('历史最近一次明确为零时不把更早的正数记录当作冲突', () => {
